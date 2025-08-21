@@ -12,7 +12,7 @@ export default defineConfig({
     allowedHosts: ['onlineportal-9rqm.onrender.com'],
     proxy: {
       '/api': {
-        target: 'http://localhost:5000',
+        target: 'https://backendonlineportal.onrender.com',
         changeOrigin: true,
         secure: false,
         ws: true,

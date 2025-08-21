@@ -1,14 +1,14 @@
 import axios from 'axios';
 
 // Use Vite environment variables for API base URL
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://backendonlineportal.onrender.com';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
-  withCredentials: true, // Enable sending cookies with requests
+  withCredentials: false, // Avoid credentialed requests; we use Authorization header
   timeout: 15000, // 15s client-side timeout to avoid hanging requests
 });
 
