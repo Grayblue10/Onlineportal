@@ -8,6 +8,8 @@ export default defineConfig({
     port: 5173,
     host: '0.0.0.0',
     strictPort: true,
+    // Allow Render-hosted domain
+    allowedHosts: ['onlineportal-9rqm.onrender.com'],
     proxy: {
       '/api': {
         target: 'http://localhost:5000',
