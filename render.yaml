@@ -16,11 +16,11 @@ services:
         # Replace with your frontend URL after first deploy, or add multiple comma-separated origins
         value: https://your-frontend.onrender.com
 
-  - type: static_site
+  - type: static
     name: grading-frontend
     rootDir: .
     buildCommand: npm install && npm run build
-    staticPublishPath: dist
+    publishPath: dist
     autoDeploy: true
     envVars:
       - key: VITE_API_BASE_URL
