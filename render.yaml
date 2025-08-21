@@ -16,7 +16,7 @@ services:
         # Replace with your frontend URL after first deploy, or add multiple comma-separated origins
         value: https://your-frontend.onrender.com
 
-  - type: static
+  - type: static_site
     name: grading-frontend
     rootDir: .
     buildCommand: npm install && npm run build
