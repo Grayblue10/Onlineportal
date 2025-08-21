@@ -4,6 +4,10 @@ import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import cors from 'cors';
+import helmet from 'helmet';
+import mongoSanitize from 'express-mongo-sanitize';
+import xssClean from 'xss-clean';
+import rateLimit from 'express-rate-limit';
 
 console.log('🚀 Starting server...');
 
@@ -44,6 +48,22 @@ app.use(
     optionsSuccessStatus: 204,
   })
 );
+// Trust proxy for rate limiting and correct client IP on Render
+app.set('trust proxy', 1);
+
+// Security middleware
+app.use(helmet());
+app.use(mongoSanitize());
+app.use(xssClean());
+
+// Rate limiting (per IP)
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 300, // max requests per window per IP
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+app.use('/api', limiter);
 console.log('🔧 Middleware configured');
 
 // Test route
