@@ -43,51 +43,6 @@ const TeacherAssignment = () => {
         setLoading(false);
       }
     };
-
-  // Handle unassigning a teacher from a specific subject code
-  const handleUnassign = async (subjectCode) => {
-    if (!selectedTeacher) {
-      toast.error('Please select a teacher first');
-      return;
-    }
-
-    const subject = subjects.find((s) => s.code === subjectCode);
-    if (!subject) {
-      toast.error('Subject not found');
-      return;
-    }
-
-    const confirmMsg = deleteIfEmpty
-      ? `Unassign teacher from ${subject.code}. If the class has no students, it will be deleted. Continue?`
-      : `Unassign teacher from ${subject.code}?`;
-    if (!window.confirm(confirmMsg)) return;
-
-    try {
-      setUnassigning(true);
-      const payload = {
-        teacherId: selectedTeacher,
-        subjectId: subject._id,
-        semester,
-        academicYear,
-        deleteIfEmpty,
-      };
-
-      const resp = await adminClassService.unassignTeacherFromSubject(payload);
-      toast.success(resp?.message || `Unassigned from ${subject.code}`);
-
-      // Refresh teachers data to reflect updated assignments
-      const teachersResponse = await api.get('/api/admin/teachers', {
-        params: { semester, academicYear },
-      });
-      setTeachers(teachersResponse.data.data || []);
-    } catch (error) {
-      const errorMessage = error.response?.data?.error || error.response?.data?.message || 'Failed to unassign teacher';
-      console.error('[TeacherAssignment] Unassign error:', error);
-      toast.error(errorMessage);
-    } finally {
-      setUnassigning(false);
-    }
-  };
     fetchData();
   }, [semester, academicYear]);
 
@@ -158,6 +113,51 @@ const TeacherAssignment = () => {
       toast.error(errorMessage);
     } finally {
       setAssigning(false);
+    }
+  };
+
+  // Handle unassigning a teacher from a specific subject code
+  const handleUnassign = async (subjectCode) => {
+    if (!selectedTeacher) {
+      toast.error('Please select a teacher first');
+      return;
+    }
+
+    const subject = subjects.find((s) => s.code === subjectCode);
+    if (!subject) {
+      toast.error('Subject not found');
+      return;
+    }
+
+    const confirmMsg = deleteIfEmpty
+      ? `Unassign teacher from ${subject.code}. If the class has no students, it will be deleted. Continue?`
+      : `Unassign teacher from ${subject.code}?`;
+    if (!window.confirm(confirmMsg)) return;
+
+    try {
+      setUnassigning(true);
+      const payload = {
+        teacherId: selectedTeacher,
+        subjectId: subject._id,
+        semester,
+        academicYear,
+        deleteIfEmpty,
+      };
+
+      const resp = await adminClassService.unassignTeacherFromSubject(payload);
+      toast.success(resp?.message || `Unassigned from ${subject.code}`);
+
+      // Refresh teachers data to reflect updated assignments
+      const teachersResponse = await api.get('/api/admin/teachers', {
+        params: { semester, academicYear },
+      });
+      setTeachers(teachersResponse.data.data || []);
+    } catch (error) {
+      const errorMessage = error.response?.data?.error || error.response?.data?.message || 'Failed to unassign teacher';
+      console.error('[TeacherAssignment] Unassign error:', error);
+      toast.error(errorMessage);
+    } finally {
+      setUnassigning(false);
     }
   };
 
@@ -292,6 +292,8 @@ const TeacherAssignment = () => {
                       </div>
                     </div>
                   )}
+                </div>
+              )}
             {/* Semester and Year */}
             <div className="grid grid-cols-2 gap-4">
               <div>
