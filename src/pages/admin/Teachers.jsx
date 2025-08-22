@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../services/api';
-import { Button, Input, Card, Modal, Badge } from '../../components/ui';
+import { Button, Input, Card, Modal, Badge, ResponsiveTable, MobileCardList } from '../../components/ui';
 import { 
   Search, 
   Pencil, 
@@ -205,9 +205,74 @@ export default function Teachers() {
         </div>
       </Card>
 
-      {/* Teachers Table */}
-      <Card>
-        <div className="overflow-x-auto">
+      {/* Mobile: stacked cards */}
+      <MobileCardList>
+        {loading ? (
+          <div className="p-4 text-center text-sm text-gray-500">Loading...</div>
+        ) : teachers.length === 0 ? (
+          <div className="p-4 text-center text-sm text-gray-500">No teachers found</div>
+        ) : (
+          <div className="divide-y divide-gray-200">
+            {teachers.map((teacher) => (
+              <div key={teacher._id} className="p-4">
+                <div className="flex items-center gap-3">
+                  <div className="flex-shrink-0 h-10 w-10 rounded-full bg-teacher-100 flex items-center justify-center">
+                    <User className="h-5 w-5 text-teacher-600" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-medium text-gray-900 truncate">{teacher.fullName}</div>
+                    <div className="text-sm text-gray-500 truncate">{teacher.email}</div>
+                  </div>
+                  <Badge variant={teacher.isActive ? 'success' : 'danger'}>
+                    {teacher.isActive ? 'Active' : 'Inactive'}
+                  </Badge>
+                </div>
+                <div className="mt-3 space-y-1 text-sm text-gray-700">
+                  <div className="flex items-center">
+                    <Hash className="h-4 w-4 mr-2 text-gray-400" />
+                    <span className="font-medium mr-1">Employee ID:</span>
+                    {teacher.employeeId}
+                  </div>
+                  {teacher.contactNumber && (
+                    <div className="flex items-center">
+                      <Phone className="h-4 w-4 mr-2 text-gray-400" />
+                      {teacher.contactNumber}
+                    </div>
+                  )}
+                  {teacher.address && (
+                    <div className="flex items-start">
+                      <MapPin className="h-4 w-4 mr-2 text-gray-400 mt-0.5" />
+                      <span className="text-gray-600">{teacher.address}</span>
+                    </div>
+                  )}
+                </div>
+                <div className="mt-3 flex justify-end gap-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleEdit(teacher)}
+                    title="Edit teacher"
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleDelete(teacher._id)}
+                    className="text-red-600 hover:text-red-800 hover:bg-red-50"
+                    title="Delete teacher"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </MobileCardList>
+
+      {/* Desktop/Tablet: Teachers Table */}
+      <ResponsiveTable>
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
@@ -311,8 +376,7 @@ export default function Teachers() {
               )}
             </tbody>
           </table>
-        </div>
-      </Card>
+      </ResponsiveTable>
 
       {/* Add/Edit Teacher Modal */}
       <Modal

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Plus, Search, Filter, Edit, Trash2, Save, FileText, Users, Award, Calculator, Loader2 } from 'lucide-react';
-import { Button, Input, Card, Modal, Badge, Select } from '../../components/ui';
+import { Button, Input, Card, Modal, Badge, Select, MobileCardList, ResponsiveTable } from '../../components/ui';
 import { toast } from 'react-hot-toast';
 import { useAuth } from '../../hooks/useAuth';
 import { useSearchParams } from 'react-router-dom';
@@ -463,8 +463,56 @@ export default function TeacherGrades() {
         </Card>
       )}
 
-      <Card>
-        <div className="overflow-x-auto">
+      {/* Mobile: stacked cards */}
+      <MobileCardList>
+        {loading ? (
+          <div className="p-4 text-center text-sm text-gray-500">Loading...</div>
+        ) : grades.length === 0 ? (
+          <div className="p-4 text-center text-sm text-gray-500">No grades found</div>
+        ) : (
+          <div className="divide-y divide-gray-200">
+            {grades.map((grade) => (
+              <div key={grade.id} className="p-4">
+                <div className="flex items-center gap-3">
+                  <div className="flex-shrink-0 h-10 w-10 rounded-full bg-teacher-100 flex items-center justify-center">
+                    <Users className="h-5 w-5 text-teacher-600" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-medium text-gray-900 truncate">
+                      {grade.student.firstName} {grade.student.lastName}
+                    </div>
+                    <div className="text-sm text-gray-500 truncate">{grade.student.studentId}</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-lg font-semibold text-gray-900">{Number(grade.score).toFixed(2)}</div>
+                    <div className="text-xs text-gray-500">(1.00–5.00)</div>
+                  </div>
+                </div>
+                <div className="mt-3 flex flex-wrap items-center gap-2 text-sm text-gray-700">
+                  <Badge className={getAssessmentBadgeColor(grade.assessmentType)}>
+                    {grade.assessmentType}
+                  </Badge>
+                  <span className="text-gray-500">{grade.title}</span>
+                  <span className="text-gray-500">• {grade.class.name}</span>
+                  <span className="text-gray-500">• {grade.subject.name}</span>
+                  <span className="text-gray-500">{new Date(grade.gradedAt).toLocaleDateString()}</span>
+                </div>
+                <div className="mt-3 flex justify-end gap-2">
+                  <Button variant="outline" size="sm" onClick={() => handleEdit(grade)}>
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                  <Button variant="danger" size="sm" onClick={() => handleDelete(grade.id)}>
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </MobileCardList>
+
+      {/* Desktop/Tablet: table */}
+      <ResponsiveTable>
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
@@ -552,8 +600,7 @@ export default function TeacherGrades() {
               )}
             </tbody>
           </table>
-        </div>
-      </Card>
+      </ResponsiveTable>
 
       {/* Add/Edit Grade Modal */}
       <Modal

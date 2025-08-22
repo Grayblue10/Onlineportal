@@ -20,3 +20,7 @@ export { default as Switch } from './Switch';
 // Feedback Components
 export { default as Alert } from './Alert';
 export { default as Spinner } from './Spinner';
+
+// Responsive helpers
+export { default as ResponsiveTable } from './ResponsiveTable';
+export { default as MobileCardList } from './MobileCardList';

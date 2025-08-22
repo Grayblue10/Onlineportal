@@ -3,7 +3,7 @@ import {
   Users, BookOpen, Calendar, Clock, Search, 
   Filter, Eye, Edit, Plus, Loader2, RefreshCw 
 } from 'lucide-react';
-import { Button, Input, Card, Badge, Modal } from '../../components/ui';
+import { Button, Input, Card, Badge, Modal, MobileCardList, ResponsiveTable } from '../../components/ui';
 import { toast } from 'react-hot-toast';
 import { useAuth } from '../../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
@@ -416,39 +416,68 @@ export default function TeacherClasses() {
               ) : modalStudents.length === 0 ? (
                 <div className="text-sm text-gray-500">No enrolled students found.</div>
               ) : (
-                <div className="max-h-64 overflow-y-auto border border-gray-100 rounded-md">
-                  <table className="min-w-full text-sm">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th className="text-left px-3 py-2 text-gray-600 font-medium">Student</th>
-                        <th className="text-left px-3 py-2 text-gray-600 font-medium">ID</th>
-                        <th className="text-right px-3 py-2 text-gray-600 font-medium">Action</th>
-                      </tr>
-                    </thead>
-                    <tbody>
+                <>
+                  {/* Mobile list */}
+                  <MobileCardList>
+                    <div className="divide-y divide-gray-200">
                       {modalStudents.map((st) => (
-                        <tr key={st._id} className="border-t">
-                          <td className="px-3 py-2 text-gray-900">{st.firstName} {st.lastName}</td>
-                          <td className="px-3 py-2 text-gray-600">{st.studentId}</td>
-                          <td className="px-3 py-2 text-right">
-                            <Button
-                              size="xs"
-                              variant="primary"
-                              onClick={() => {
-                                setIsModalOpen(false);
-                                const subj = selectedClass.subjectId ? `&subject=${selectedClass.subjectId}` : '';
-                                navigate(`/teacher/grades?class=${selectedClass.id}${subj}&student=${st._id}`);
-                              }}
-                            >
-                              <Edit className="w-3 h-3 mr-1" />
-                              Grade
-                            </Button>
-                          </td>
-                        </tr>
+                        <div key={st._id} className="p-3 flex items-center justify-between">
+                          <div className="min-w-0 mr-3">
+                            <div className="text-sm font-medium text-gray-900 truncate">{st.firstName} {st.lastName}</div>
+                            <div className="text-xs text-gray-500 truncate">{st.studentId}</div>
+                          </div>
+                          <Button
+                            size="xs"
+                            variant="primary"
+                            onClick={() => {
+                              setIsModalOpen(false);
+                              const subj = selectedClass.subjectId ? `&subject=${selectedClass.subjectId}` : '';
+                              navigate(`/teacher/grades?class=${selectedClass.id}${subj}&student=${st._id}`);
+                            }}
+                          >
+                            <Edit className="w-3 h-3 mr-1" />
+                            Grade
+                          </Button>
+                        </div>
                       ))}
-                    </tbody>
-                  </table>
-                </div>
+                    </div>
+                  </MobileCardList>
+
+                  {/* Desktop/tablet table */}
+                  <ResponsiveTable>
+                    <table className="min-w-[520px] text-sm">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="text-left px-3 py-2 text-gray-600 font-medium">Student</th>
+                          <th className="text-left px-3 py-2 text-gray-600 font-medium">ID</th>
+                          <th className="text-right px-3 py-2 text-gray-600 font-medium">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {modalStudents.map((st) => (
+                          <tr key={st._id} className="border-t">
+                            <td className="px-3 py-2 text-gray-900">{st.firstName} {st.lastName}</td>
+                            <td className="px-3 py-2 text-gray-600">{st.studentId}</td>
+                            <td className="px-3 py-2 text-right">
+                              <Button
+                                size="xs"
+                                variant="primary"
+                                onClick={() => {
+                                  setIsModalOpen(false);
+                                  const subj = selectedClass.subjectId ? `&subject=${selectedClass.subjectId}` : '';
+                                  navigate(`/teacher/grades?class=${selectedClass.id}${subj}&student=${st._id}`);
+                                }}
+                              >
+                                <Edit className="w-3 h-3 mr-1" />
+                                Grade
+                              </Button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </ResponsiveTable>
+                </>
               )}
             </div>
             

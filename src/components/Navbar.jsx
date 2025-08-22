@@ -1,9 +1,9 @@
 import { Link } from 'react-router-dom';
-import { LogOut, User } from 'lucide-react';
+import { LogOut, User, Menu } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import tracLogo from '../assets/images/traclogo.png';
 
-const Navbar = () => {
+const Navbar = ({ showMenuButton = false, onMenuClick }) => {
   const { user, logout, isAdmin, isTeacher, isStudent } = useAuth();
 
   const getRoleColor = () => {
@@ -24,7 +24,17 @@ const Navbar = () => {
     <nav className="fixed top-0 inset-x-0 z-50 shadow-sm border-b border-gray-200 bg-white" style={{backgroundColor: '#ffffff', color: 'black'}}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          <div className="flex items-center">
+          <div className="flex items-center gap-2">
+            {showMenuButton && (
+              <button
+                type="button"
+                onClick={onMenuClick}
+                className="md:hidden p-2 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300"
+                aria-label="Open menu"
+              >
+                <Menu className="w-6 h-6 text-black" />
+              </button>
+            )}
             <Link to="/" className="flex items-center space-x-2">
               <img src={tracLogo} alt="TRAC Logo" className="h-8 w-auto" />
               <span className="text-xl font-bold text-black">GradingSystem</span>

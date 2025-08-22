@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Award, BookOpen, TrendingUp, Filter, Search, Eye, Calendar, BarChart3, AlertCircle, RefreshCw } from 'lucide-react';
-import { Button, Input, Card, Badge, Modal } from '../../components/ui';
+import { Button, Input, Card, Badge, Modal, MobileCardList, ResponsiveTable } from '../../components/ui';
 import { toast } from 'react-hot-toast';
 import { useAuth } from '../../hooks/useAuth';
 import api from '../../services/api';
@@ -382,9 +382,47 @@ export default function StudentGrades() {
         </div>
       </Card>
 
-      {/* Grades Table */}
-      <Card>
-        <div className="overflow-x-auto">
+      {/* Mobile: stacked cards */}
+      <MobileCardList>
+        {filteredGrades.length === 0 ? (
+          <div className="p-4 text-center text-sm text-gray-500">No grades found</div>
+        ) : (
+          <div className="divide-y divide-gray-200">
+            {filteredGrades.map((grade) => (
+              <div key={grade._id || grade.id} className="p-4">
+                <div className="flex items-center gap-3">
+                  <div className="flex-shrink-0 h-10 w-10 rounded-full bg-student-100 flex items-center justify-center">
+                    <BookOpen className="h-5 w-5 text-student-600" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-medium text-gray-900 truncate">{grade.subject?.name}</div>
+                    <div className="text-sm text-gray-500 truncate">{grade.title}</div>
+                  </div>
+                  <span className={`ml-3 px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getNumericGradeColor(grade.score)} text-white`}>
+                    {typeof grade.score === 'number' ? grade.score.toFixed(2) : 'N/A'}
+                  </span>
+                </div>
+                <div className="mt-3 flex flex-wrap items-center gap-2 text-sm text-gray-700">
+                  <Badge className={getAssessmentBadgeColor(grade.assessmentType)}>
+                    {grade.assessmentType}
+                  </Badge>
+                  <span className="text-gray-500">
+                    {grade.gradedAt ? new Date(grade.gradedAt).toLocaleDateString() : 'N/A'}
+                  </span>
+                </div>
+                <div className="mt-3 flex justify-end">
+                  <Button variant="ghost" size="sm" onClick={() => handleViewGrade(grade)}>
+                    <Eye className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </MobileCardList>
+
+      {/* Desktop/Tablet: Grades Table */}
+      <ResponsiveTable>
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
@@ -458,8 +496,7 @@ export default function StudentGrades() {
               )}
             </tbody>
           </table>
-        </div>
-      </Card>
+      </ResponsiveTable>
 
       {/* Grade Details Modal */}
       <Modal
