@@ -239,11 +239,23 @@ export default function TeacherGrades() {
         try {
           await teacherService.updateGrade(updateId, payload);
         } catch (err) {
-          // Fallback for servers that update via class/student route
+          // Fallback for servers that update via /grades/student/:studentId
           const status = err?.response?.status;
           if (status === 404 || status === 405) {
-            console.warn('[Grades] updateGrade not supported, falling back to updateStudentGrade');
-            await teacherService.updateStudentGrade(gradeFormData.classId, gradeFormData.studentId, payload);
+            console.warn('[Grades] updateGrade not supported, falling back to updateStudentGradeByStudentId');
+            // Transform payload for backend variant: subject as ID and grade 0-100
+            const selectedClass = classes.find(c => c._id === gradeFormData.classId);
+            const subjectId = selectedClass?.subject?._id || undefined;
+            const score1to5 = Math.max(1, Math.min(5, Number(gradeFormData.score) || 1));
+            const gradePercent = Math.round(((5 - score1to5) / 4) * 100);
+            const altPayload = {
+              subject: subjectId || gradeFormData.subjectCode, // backend expects subject MongoId
+              grade: gradePercent, // 0-100 scale
+              semester: gradeFormData.semester,
+              comments: '',
+              isFinal: true
+            };
+            await teacherService.updateStudentGradeByStudentId(gradeFormData.studentId, altPayload);
           } else {
             throw err;
           }

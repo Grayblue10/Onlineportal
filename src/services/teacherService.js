@@ -209,6 +209,22 @@ const teacherService = {
       throw error;
     }
   },
+
+  // Update student grade by studentId (backend variant)
+  updateStudentGradeByStudentId: async (studentId, gradeData) => {
+    console.log(`[TeacherService] Updating grade via /grades/student for ${studentId}:`, gradeData);
+    try {
+      const response = await api.put(`/api/teacher/grades/student/${studentId}`, gradeData);
+      // Invalidate generic grades caches
+      cache.forEach((_, key) => {
+        if (key.startsWith('grades_')) cache.delete(key);
+      });
+      return response.data;
+    } catch (error) {
+      console.error('[TeacherService] Error updating grade via student route:', error);
+      throw error;
+    }
+  },
   
   // Get a student's grades in a class
   getStudentGrades: async (classId, studentId) => {
