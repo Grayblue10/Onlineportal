@@ -3,6 +3,7 @@ import { UserCheck, BookOpen, AlertTriangle, CheckCircle, Loader2, Users, Award 
 import { toast } from 'react-hot-toast';
 import { Button, Card } from '../../components/ui';
 import api from '../../services/api';
+import adminClassService from '../../services/adminClassService';
 
 const TeacherAssignment = () => {
   const [teachers, setTeachers] = useState([]);
@@ -13,6 +14,7 @@ const TeacherAssignment = () => {
   const [academicYear, setAcademicYear] = useState(new Date().getFullYear());
   const [loading, setLoading] = useState(false);
   const [assigning, setAssigning] = useState(false);
+  const [deleteIfEmpty, setDeleteIfEmpty] = useState(false);
 
   // Fetch teachers and subjects
   useEffect(() => {
@@ -201,44 +203,52 @@ const TeacherAssignment = () => {
                   </option>
                 ))}
               </select>
-            </div>
 
-            {/* Selected Teacher Info */}
-            {selectedTeacherData && (
-              <div className="p-4 rounded-lg border" style={{backgroundColor: 'var(--deep-blue-50)', borderColor: 'var(--deep-blue-200)'}}>
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="font-medium" style={{color: 'var(--deep-blue-800)'}}>{selectedTeacherData.name}</h3>
-                  <span className="text-sm" style={{color: 'var(--deep-blue-700)'}}>
-                    {selectedTeacherData.currentAssignments}/2 subjects assigned
-                  </span>
-                </div>
-                <p className="text-sm mb-2" style={{color: 'var(--deep-blue-700)'}}>{selectedTeacherData.email}</p>
-                
-                {selectedTeacherData.subjects.length > 0 && (
-                  <div>
-                    <p className="text-sm font-medium mb-1" style={{color: 'var(--deep-blue-800)'}}>Current Subjects:</p>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedTeacherData.subjects.map((subject, index) => (
-                        <span
-                          key={index}
-                          className="px-2 py-1 text-xs rounded-full"
-                          style={{backgroundColor: 'var(--deep-blue-100)', color: 'var(--deep-blue-800)'}}
-                        >
-                          {subject.code} - {subject.name}
-                        </span>
-                      ))}
+              {/* Selected teacher details & unassign controls */}
+              {selectedTeacher && selectedTeacherData && (
+                <div className="mt-4 p-4 rounded-lg border" style={{backgroundColor: 'var(--deep-blue-50)', borderColor: 'var(--deep-blue-200)'}}>
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="font-medium" style={{color: 'var(--deep-blue-800)'}}>{selectedTeacherData.name}</h3>
+                    <span className="text-sm" style={{color: 'var(--deep-blue-700)'}}>
+                      {selectedTeacherData.currentAssignments}/2 subjects assigned
+                    </span>
+                  </div>
+                  <p className="text-sm mb-2" style={{color: 'var(--deep-blue-700)'}}>{selectedTeacherData.email}</p>
+                  {/* Delete if empty toggle */}
+                  <label className="flex items-center gap-2 mb-3 text-sm" style={{color: 'var(--deep-blue-800)'}}>
+                    <input
+                      type="checkbox"
+                      checked={deleteIfEmpty}
+                      onChange={(e) => setDeleteIfEmpty(e.target.checked)}
+                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    />
+                    Delete class if it has no students
+                  </label>
+
+                  {selectedTeacherData.subjects.length > 0 && (
+                    <div>
+                      <p className="text-sm font-medium mb-1" style={{color: 'var(--deep-blue-800)'}}>Current Subjects:</p>
+                      <div className="flex flex-col gap-2">
+                        {selectedTeacherData.subjects.map((subject, index) => (
+                          <div key={index} className="flex items-center justify-between bg-white rounded-md border px-2 py-1">
+                            <span className="text-xs font-medium" style={{color: 'var(--deep-blue-800)'}}>
+                              {subject.code} - {subject.name}
+                            </span>
+                            <Button
+                              variant="danger"
+                              size="sm"
+                              onClick={() => handleUnassign(subject.code)}
+                            >
+                              Unassign
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                )}
-                
-                {selectedTeacherData.availableSlots === 0 && (
-                  <div className="mt-2 flex items-center" style={{color: 'var(--golden-yellow-800)'}}>
-                    <AlertTriangle className="h-4 w-4 mr-1" />
-                    <span className="text-sm">Teacher has reached maximum assignment limit</span>
-                  </div>
-                )}
-              </div>
-            )}
+                  )}
+                </div>
+              )}
+            </div>
 
             {/* Semester and Year */}
             <div className="grid grid-cols-2 gap-4">
