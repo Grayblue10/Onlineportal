@@ -29,7 +29,7 @@ const Navbar = ({ showMenuButton = false, onMenuClick }) => {
               <button
                 type="button"
                 onClick={onMenuClick}
-                className="md:hidden p-2 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300"
+                className="p-2 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300"
                 aria-label="Open menu"
               >
                 <Menu className="w-6 h-6 text-black" />

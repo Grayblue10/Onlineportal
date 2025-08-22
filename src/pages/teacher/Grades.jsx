@@ -220,9 +220,11 @@ export default function TeacherGrades() {
       };
       
       if (isEditing) {
-        // Update existing grade
-        console.log('[Grades] Updating grade:', { id: currentGrade._id, data: payload });
-        await teacherService.updateGrade(currentGrade._id, payload);
+        // Update existing grade (support _id or id)
+        const updateId = currentGrade?._id || currentGrade?.id;
+        if (!updateId) throw new Error('Missing grade id for update');
+        console.log('[Grades] Updating grade:', { id: updateId, data: payload });
+        await teacherService.updateGrade(updateId, payload);
         toast.success('Grade updated successfully');
       } else {
         // Create new grade
@@ -448,15 +450,24 @@ export default function TeacherGrades() {
           ) : (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-2">
               {filteredStudents.map(s => (
-                <div key={s._id} className="flex items-center justify-between px-3 py-2 rounded border border-gray-200">
+                <button
+                  type="button"
+                  key={s._id}
+                  onClick={() => setGradeFormData(prev => ({ ...prev, studentId: s._id }))}
+                  className={`flex items-center justify-between px-3 py-2 rounded border text-left transition ${
+                    gradeFormData.studentId === s._id
+                      ? 'border-teacher-400 ring-2 ring-teacher-200 bg-teacher-50'
+                      : 'border-gray-200 hover:bg-gray-50'
+                  }`}
+                >
                   <div>
                     <div className="text-sm font-medium text-gray-900">{s.firstName} {s.lastName}</div>
                     <div className="text-xs text-gray-500">{s.studentId}</div>
                   </div>
-                  <Button size="xs" variant="outline" onClick={() => setGradeFormData(prev => ({ ...prev, studentId: s._id }))}>
-                    Select
-                  </Button>
-                </div>
+                  {gradeFormData.studentId === s._id && (
+                    <Badge className="bg-teacher-100 text-teacher-800">Selected</Badge>
+                  )}
+                </button>
               ))}
             </div>
           )}
