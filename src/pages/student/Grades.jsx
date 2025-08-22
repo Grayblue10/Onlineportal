@@ -270,9 +270,8 @@ export default function StudentGrades() {
       (grade.title?.toLowerCase() || '').includes(filters.search.toLowerCase());
     const matchesSubject = !filters.subject || grade.subject?.name === filters.subject;
     const matchesSemester = !filters.semester || grade.semester === filters.semester;
-    const matchesAssessmentType = !filters.assessmentType || grade.assessmentType === filters.assessmentType;
-    
-    return matchesSearch && matchesSubject && matchesSemester && matchesAssessmentType;
+    // AssessmentType filter removed from UI; always include
+    return matchesSearch && matchesSubject && matchesSemester;
   });
   
   console.log('[Grades] Applied filters:', {
@@ -314,7 +313,7 @@ export default function StudentGrades() {
 
       {/* Filters */}
       <Card className="p-4">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Subject</label>
             <select 
@@ -345,40 +344,7 @@ export default function StudentGrades() {
               ))}
             </select>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Assessment Type</label>
-            <select 
-              className="w-full p-2 border border-gray-300 rounded-md"
-              value={filters.assessmentType}
-              onChange={(e) => setFilters({...filters, assessmentType: e.target.value})}
-              disabled={loading}
-            >
-              <option value="">All Types</option>
-              {assessmentTypes.map((type) => (
-                <option key={type} value={type}>
-                  {type.charAt(0).toUpperCase() + type.slice(1)}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="flex items-end">
-            <button 
-              className={`w-full py-2 px-4 rounded-md transition-colors ${
-                loading 
-                  ? 'bg-gray-300 cursor-not-allowed' 
-                  : 'bg-student-600 text-white hover:bg-student-700'
-              }`}
-              onClick={() => setFilters({
-                search: '',
-                subject: '',
-                semester: '',
-                assessmentType: ''
-              })}
-              disabled={loading}
-            >
-              {loading ? 'Loading...' : 'Clear Filters'}
-            </button>
-          </div>
+          
         </div>
       </Card>
 

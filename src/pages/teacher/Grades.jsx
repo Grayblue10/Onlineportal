@@ -93,7 +93,8 @@ export default function TeacherGrades() {
       
       // Handle classes response
       if (classesResponse.status === 'fulfilled') {
-        setClasses(classesResponse.value.data || []);
+        // teacherService returns parsed data already
+        setClasses(classesResponse.value || []);
       } else {
         console.error('[TeacherGrades] Error fetching classes:', classesResponse.reason);
         toast.error('Failed to load classes');
@@ -106,7 +107,7 @@ export default function TeacherGrades() {
         setSubjects(list);
       } else {
         console.warn('[TeacherGrades] Subjects API unavailable, deriving from classes');
-        const unique = [...new Map((classesResponse.status === 'fulfilled' ? (classesResponse.value.data || []) : [])
+        const unique = [...new Map((classesResponse.status === 'fulfilled' ? (classesResponse.value || []) : [])
           .filter(c => c.subject)
           .map(c => [c.subject.code || c.subject.name, c.subject])
         ).values()];
@@ -115,10 +116,17 @@ export default function TeacherGrades() {
       
       // Handle students response
       if (studentsResponse.status === 'fulfilled') {
-        setStudents(studentsResponse.value.data || []);
+        setStudents(studentsResponse.value || []);
       } else {
-        console.error('[TeacherGrades] Error fetching students:', studentsResponse.reason);
-        toast.error('Failed to load students');
+        console.warn('[TeacherGrades] getStudents() failed, attempting fallback to getEnrolledStudents()', studentsResponse.reason);
+        try {
+          const enrolled = await teacherService.getEnrolledStudents();
+          const list = Array.isArray(enrolled) ? enrolled : (Array.isArray(enrolled?.data) ? enrolled.data : []);
+          setStudents(list);
+        } catch (fallbackError) {
+          console.error('[TeacherGrades] Fallback getEnrolledStudents() failed:', fallbackError);
+          toast.error('Failed to load students');
+        }
       }
       
     } catch (error) {
@@ -224,7 +232,18 @@ export default function TeacherGrades() {
         const updateId = currentGrade?._id || currentGrade?.id;
         if (!updateId) throw new Error('Missing grade id for update');
         console.log('[Grades] Updating grade:', { id: updateId, data: payload });
-        await teacherService.updateGrade(updateId, payload);
+        try {
+          await teacherService.updateGrade(updateId, payload);
+        } catch (err) {
+          // Fallback for servers that update via class/student route
+          const status = err?.response?.status;
+          if (status === 404 || status === 405) {
+            console.warn('[Grades] updateGrade not supported, falling back to updateStudentGrade');
+            await teacherService.updateStudentGrade(gradeFormData.classId, gradeFormData.studentId, payload);
+          } else {
+            throw err;
+          }
+        }
         toast.success('Grade updated successfully');
       } else {
         // Create new grade
@@ -483,7 +502,7 @@ export default function TeacherGrades() {
         ) : (
           <div className="divide-y divide-gray-200">
             {grades.map((grade) => (
-              <div key={grade.id} className="p-4">
+              <div key={grade._id || grade.id} className="p-4">
                 <div className="flex items-center gap-3">
                   <div className="flex-shrink-0 h-10 w-10 rounded-full bg-teacher-100 flex items-center justify-center">
                     <Users className="h-5 w-5 text-teacher-600" />
@@ -512,7 +531,7 @@ export default function TeacherGrades() {
                   <Button variant="outline" size="sm" onClick={() => handleEdit(grade)}>
                     <Edit className="h-4 w-4" />
                   </Button>
-                  <Button variant="danger" size="sm" onClick={() => handleDelete(grade.id)}>
+                  <Button variant="danger" size="sm" onClick={() => handleDelete(grade._id || grade.id)}>
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
@@ -550,7 +569,7 @@ export default function TeacherGrades() {
                 </tr>
               ) : (
                 grades.map((grade) => (
-                  <tr key={grade.id} className="hover:bg-gray-50">
+                  <tr key={grade._id || grade.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <div className="flex-shrink-0 h-10 w-10 rounded-full bg-teacher-100 flex items-center justify-center">
@@ -600,7 +619,7 @@ export default function TeacherGrades() {
                         <Button
                           variant="danger"
                           size="sm"
-                          onClick={() => handleDelete(grade.id)}
+                          onClick={() => handleDelete(grade._id || grade.id)}
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>

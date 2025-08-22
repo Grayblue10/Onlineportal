@@ -17,7 +17,7 @@ const TeacherLayout = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 pt-16">
-      <Navbar showMenuButton onMenuClick={() => setMobileOpen(true)} />
+      <Navbar showMenuButton onMenuClick={() => setMobileOpen((prev) => !prev)} />
       {mobileOpen && (
         <div className="fixed inset-0 bg-black/40 z-40 md:hidden" onClick={() => setMobileOpen(false)} />
       )}

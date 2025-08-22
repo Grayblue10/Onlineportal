@@ -260,9 +260,9 @@ export default function StudentSubjects() {
       (subject.name?.toLowerCase() || '').includes(filters.search.toLowerCase()) ||
       (subject.code?.toLowerCase() || '').includes(filters.search.toLowerCase());
     const matchesSemester = !filters.semester || subject.semester === filters.semester;
-    const matchesDepartment = !filters.department || subject.department === filters.department;
 
-    return matchesSearch && matchesSemester && matchesDepartment;
+    // Department filter removed from UI; do not filter by department
+    return matchesSearch && matchesSemester;
   });
   
   console.log('[Subjects] Applied filters:', {
@@ -286,7 +286,7 @@ export default function StudentSubjects() {
 
       {/* Filters */}
       <Card className="p-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Semester</label>
             <select 
@@ -303,34 +303,7 @@ export default function StudentSubjects() {
               ))}
             </select>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Department</label>
-            <select 
-              className="w-full p-2 border border-gray-300 rounded-md"
-              value={filters.department}
-              onChange={(e) => setFilters({...filters, department: e.target.value})}
-              disabled={loading}
-            >
-              <option value="">All Departments</option>
-              {departments.map((dept) => (
-                <option key={dept} value={dept}>{dept}</option>
-              ))}
-            </select>
-          </div>
           <div className="flex items-end gap-2">
-            <Button 
-              variant="secondary"
-              size="md"
-              onClick={() => setFilters({
-                search: '',
-                semester: '',
-                department: ''
-              })}
-              disabled={loading}
-              className="flex-1"
-            >
-              Clear Filters
-            </Button>
             <Button 
               variant="outline"
               size="md"
