@@ -1,14 +1,15 @@
 import React from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import Navbar from '../components/Navbar';
-import { BookOpen, Award } from 'lucide-react';
+import { BookOpen, Award, User } from 'lucide-react';
 
 const StudentLayout = () => {
   const location = useLocation();
   
   const sidebarItems = [
     { name: 'My Grades', href: '/student/grades', icon: Award },
-    { name: 'Subjects', href: '/student/subjects', icon: BookOpen }
+    { name: 'Subjects', href: '/student/subjects', icon: BookOpen },
+    { name: 'Profile', href: '/student/profile', icon: User }
   ];
 
   const isActive = (href) => {

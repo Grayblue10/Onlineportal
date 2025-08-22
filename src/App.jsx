@@ -27,6 +27,7 @@ import SubjectAssignment from './pages/teacher/SubjectAssignment';
 import EnrolledStudents from './pages/teacher/EnrolledStudents';
 import StudentGrades from './pages/student/Grades';
 import StudentSubjects from './pages/student/Subjects';
+import StudentProfile from './pages/student/Profile';
 import TeacherClasses from './pages/teacher/Classes';
 import TeacherGrades from './pages/teacher/Grades';
 
@@ -173,6 +174,11 @@ function AppRoutes() {
         <Route path="subjects" element={
           <ErrorBoundary>
             <StudentSubjects />
+          </ErrorBoundary>
+        } />
+        <Route path="profile" element={
+          <ErrorBoundary>
+            <StudentProfile />
           </ErrorBoundary>
         } />
       </Route>
