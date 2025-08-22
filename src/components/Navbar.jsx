@@ -22,9 +22,9 @@ const Navbar = ({ showMenuButton = false, onMenuClick }) => {
 
   return (
     <nav className="fixed top-0 inset-x-0 z-50 shadow-sm border-b border-gray-200 bg-white" style={{backgroundColor: '#ffffff', color: 'black'}}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
             {showMenuButton && (
               <button
                 type="button"
@@ -35,20 +35,20 @@ const Navbar = ({ showMenuButton = false, onMenuClick }) => {
                 <Menu className="w-6 h-6 text-black" />
               </button>
             )}
-            <Link to="/" className="flex items-center space-x-2">
-              <img src={tracLogo} alt="TRAC Logo" className="h-8 w-auto" />
-              <span className="text-xl font-bold text-black">GradingSystem</span>
+            <Link to="/" className="flex items-center space-x-2 min-w-0">
+              <img src={tracLogo} alt="TRAC Logo" className="h-7 sm:h-8 w-auto flex-shrink-0" />
+              <span className="hidden sm:inline text-lg sm:text-xl font-bold text-black truncate">GradingSystem</span>
             </Link>
           </div>
 
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2">
+          <div className="flex items-center gap-2 sm:gap-4">
+            <div className="hidden sm:flex items-center gap-2 min-w-0">
               <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{backgroundColor: 'var(--deep-blue-light)'}}>
                 <User className="w-5 h-5 text-black" />
               </div>
-              <div className="text-sm">
-                <p className="font-medium text-black">{user?.firstName} {user?.lastName}</p>
-                <p className="text-xs" style={{color: 'var(--golden-yellow)'}}>{getRoleName()}</p>
+              <div className="text-sm leading-tight min-w-0 hidden sm:block">
+                <p className="font-medium text-black truncate">{user?.firstName} {user?.lastName}</p>
+                <p className="text-xs truncate" style={{color: 'var(--golden-yellow)'}}>{getRoleName()}</p>
               </div>
             </div>
 

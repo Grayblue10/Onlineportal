@@ -28,12 +28,12 @@ const AdminLayout = () => {
       {/* Overlay for mobile */}
       {mobileOpen && (
         <div
-          className="fixed inset-0 bg-black/40 z-40 md:hidden"
+          className="fixed inset-0 bg-black/40 z-50 md:hidden"
           onClick={() => setMobileOpen(false)}
         />
       )}
       <div className="flex">
-        <aside className={`w-64 sidebar-primary fixed top-16 h-[calc(100vh-4rem)] overflow-y-auto shadow-lg bg-white border-r border-gray-200 z-50 transform transition-transform duration-300 md:translate-x-0 md:static md:h-auto md:top-0 ${mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
+        <aside className={`w-64 sidebar-primary fixed top-16 h-[calc(100vh-4rem)] overflow-y-auto shadow-lg bg-white border-r border-gray-200 z-40 transform transition-transform duration-300 md:translate-x-0 md:static md:h-auto md:top-0 ${mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
           <div className="p-4 md:p-6 pt-6 md:pt-8">
             <div className="mb-6">
               <h2 className="text-xl font-bold mb-2 text-blue-700">
@@ -121,7 +121,7 @@ const AdminLayout = () => {
             </nav>
           </div>
         </aside>
-        <main className="flex-1 p-4 md:p-6 md:ml-64">
+        <main className="flex-1 p-4 md:p-6">
           <Outlet />
         </main>
       </div>
