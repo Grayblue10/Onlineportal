@@ -11,7 +11,7 @@ const AdminLayout = () => {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
   const [rolesOpen, setRolesOpen] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(true);
   
   const sidebarItems = [
     { name: 'Dashboard', href: '/admin', icon: BarChart3 },
@@ -25,7 +25,7 @@ const AdminLayout = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 pt-16">
-      <Navbar showMenuButton onMenuClick={() => setMobileOpen((v) => !v)} />
+      <Navbar showMenuButton onMenuClick={() => setMobileOpen((prev) => !prev)} />
       {/* Overlay for mobile */}
       {mobileOpen && (
         <div
@@ -33,18 +33,9 @@ const AdminLayout = () => {
           onClick={() => setMobileOpen(false)}
         />
       )}
-      <div className="flex md:pl-64">
-        <aside className={`w-64 sidebar-primary fixed top-16 h-[calc(100vh-4rem)] overflow-y-auto shadow-lg bg-white border-r border-gray-200 z-50 transform transition-transform duration-300 md:translate-x-0 ${mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
-          <div className="md:hidden flex justify-end p-3">
-            <button
-              type="button"
-              onClick={() => setMobileOpen(false)}
-              className="text-gray-500 hover:text-gray-700 text-sm"
-            >
-              Close
-            </button>
-          </div>
-          <div className="p-4 md:p-6 pt-3 md:pt-8">
+      <div className="relative">
+        <aside className={`w-64 sidebar-primary fixed top-16 left-0 h-[calc(100vh-4rem)] overflow-y-auto shadow-lg bg-white border-r border-gray-200 z-50 transform transition-transform duration-300 ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+          <div className="p-4 md:p-6 pt-6 md:pt-8">
             <div className="mb-6">
               <h2 className="text-xl font-bold mb-2 text-blue-700">
                 Admin Panel
@@ -131,7 +122,7 @@ const AdminLayout = () => {
             </nav>
           </div>
         </aside>
-        <main className="flex-1 p-4 md:p-6">
+        <main className={`p-4 md:p-6 transition-all duration-300 ${mobileOpen ? 'md:ml-64' : 'md:ml-0'}`}>
           <Outlet />
         </main>
       </div>
