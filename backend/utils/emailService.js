@@ -138,7 +138,7 @@ const sendEmail = async (options) => {
  * @returns {Promise<Object>} Email info object
  */
 const sendPasswordResetEmail = async (email, token, userId, userRole = 'user') => {
-  const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/reset-password/${token}`;
+  const resetUrl = `${process.env.FRONTEND_URL || 'https://onlineportal-9rqm.onrender.com'}/reset-password/${token}`;
   
   console.log('Sending password reset email to:', email);
   console.log('Reset URL:', resetUrl);
