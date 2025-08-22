@@ -42,13 +42,13 @@ const Navbar = ({ showMenuButton = false, onMenuClick }) => {
           </div>
 
           <div className="flex items-center gap-2 sm:gap-4">
-            <div className="hidden sm:flex items-center gap-2 min-w-0">
+            <div className="flex items-center gap-2 min-w-0">
               <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{backgroundColor: 'var(--deep-blue-light)'}}>
                 <User className="w-5 h-5 text-black" />
               </div>
-              <div className="text-sm leading-tight min-w-0 hidden sm:block">
-                <p className="font-medium text-black truncate">{user?.firstName} {user?.lastName}</p>
-                <p className="text-xs truncate" style={{color: 'var(--golden-yellow)'}}>{getRoleName()}</p>
+              <div className="leading-tight min-w-0">
+                <p className="text-sm sm:text-base font-medium text-black truncate max-w-[7.5rem] sm:max-w-none">{user?.firstName} {user?.lastName}</p>
+                <p className="text-[11px] sm:text-xs truncate max-w-[7.5rem] sm:max-w-none" style={{color: 'var(--golden-yellow)'}}>{getRoleName()}</p>
               </div>
             </div>
 

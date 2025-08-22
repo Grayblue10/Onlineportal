@@ -65,6 +65,27 @@ export default function StudentSubjects() {
       const processedSubjects = subjectsData.map((subject, index) => {
         console.log(`[StudentSubjects] Processing subject ${index + 1}:`, subject);
         
+        // Derive schedule from multiple possible fields
+        const scheduleValue =
+          subject.schedule ||
+          subject.time ||
+          subject.scheduleTime ||
+          (subject.scheduleDay && subject.scheduleTime ? `${subject.scheduleDay} ${subject.scheduleTime}` : null) ||
+          (subject.schedule?.day && subject.schedule?.time ? `${subject.schedule.day} ${subject.schedule.time}` : null) ||
+          subject.timetable ||
+          subject.meetingTime ||
+          null;
+
+        // Derive room from multiple possible fields
+        const roomValue =
+          subject.room ||
+          subject.roomNumber ||
+          subject.classroom ||
+          subject.location ||
+          subject.section?.room ||
+          subject.section?.location ||
+          null;
+
         return {
           id: subject.id || subject._id || `temp-${index}`,
           _id: subject._id || subject.id,
@@ -76,8 +97,8 @@ export default function StudentSubjects() {
           department: subject.department || 'General',
           teacher: subject.teacher || { name: 'TBA', email: '' },
           teacherName: subject.teacherName || subject.teacher?.name || 'TBA',
-          schedule: subject.schedule || 'Schedule TBA',
-          room: subject.room || 'Room TBA',
+          schedule: scheduleValue || 'Schedule TBA',
+          room: roomValue || 'Room TBA',
           currentGrade: subject.currentGrade || 'N/A',
           averageScore: subject.averageScore || 0,
           completedAssignments: subject.completedAssignments || 0,
