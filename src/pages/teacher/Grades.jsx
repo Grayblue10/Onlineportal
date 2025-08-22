@@ -248,18 +248,32 @@ export default function TeacherGrades() {
             let subjectId = selectedClass?.subject?._id;
             // Fallbacks to resolve subjectId if not embedded on class
             if (!subjectId) {
-              // try from current grade
-              subjectId = currentGrade?.subject?._id;
+              // 1) Try from selected subject dropdown value
+              if (gradeFormData.subjectCode) {
+                const byDropdown = (subjects || []).find(s => s._id === gradeFormData.subjectCode || s.code === gradeFormData.subjectCode || s.name === gradeFormData.subjectCode);
+                subjectId = byDropdown?._id || subjectId;
+              }
+              // 2) Try matching class code/name against subjects list
+              if (!subjectId && selectedClass) {
+                const byClass = (subjects || []).find(s => (s.code && s.code === (selectedClass.code || selectedClass.subject?.code)) || s.name === (selectedClass.subject?.name || selectedClass.subject));
+                subjectId = byClass?._id || subjectId;
+              }
+              // 3) Try from current grade's subject details
+              if (!subjectId && currentGrade?.subject) {
+                const byCurrent = (subjects || []).find(s => s._id === currentGrade.subject._id || s.code === currentGrade.subject.code || s.name === currentGrade.subject.name);
+                subjectId = byCurrent?._id || currentGrade?.subject?._id || subjectId;
+              }
             }
-            if (!subjectId && gradeFormData.subjectCode) {
-              // try from subjects list by code or name
-              const match = (subjects || []).find(s => (s.code && s.code === gradeFormData.subjectCode) || s._id === gradeFormData.subjectCode || s.name === gradeFormData.subjectCode);
-              subjectId = match?._id;
+            // If still not resolvable, abort with a clear message
+            if (!subjectId) {
+              toast.error('Could not resolve a valid Subject. Please select the Subject from the dropdown and try again.');
+              setLoading(false);
+              return;
             }
             const score1to5 = Math.max(1, Math.min(5, Number(gradeFormData.score) || 1));
             const gradePercent = Math.round(((5 - score1to5) / 4) * 100);
             const altPayload = {
-              subject: subjectId || currentGrade?.subject?._id || gradeFormData.subjectCode, // backend expects subject MongoId
+              subject: subjectId, // backend expects subject MongoId
               grade: gradePercent, // 0-100 scale
               semester: gradeFormData.semester,
               comments: '',
