@@ -269,11 +269,11 @@ export default function TeacherClasses() {
         <div className="flex justify-center items-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teacher-600"></div>
         </div>
-      ) : classes.length === 0 ? (
+      ) : filteredClasses.length === 0 ? (
         <Card className="p-12 text-center">
           <BookOpen className="w-16 h-16 text-gray-400 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-gray-900 mb-2">No Classes Found</h3>
-          <p className="text-gray-600 mb-4">You don't have any classes assigned yet. Please assign subjects first to create classes.</p>
+          <p className="text-gray-600 mb-4">No classes match your current filters. Try clearing the search or semester filters.</p>
           <Button
             variant="primary"
             size="md"
@@ -285,7 +285,7 @@ export default function TeacherClasses() {
         </Card>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {classes.map((classItem) => (
+          {filteredClasses.map((classItem) => (
             <Card key={classItem.id} className="p-6 hover:shadow-lg transition-shadow">
               <div className="flex justify-between items-start mb-4">
                 <div className="flex items-center space-x-3">
