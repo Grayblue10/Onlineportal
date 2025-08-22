@@ -23,8 +23,18 @@ export default function StudentSubjects() {
   // Get unique departments for filter dropdown
   const departments = [...new Set(subjects.map(subject => subject.department).filter(Boolean))];
   
-  // Get unique semesters for filter dropdown
-  const semesters = [...new Set(subjects.map(subject => subject.semester).filter(Boolean))];
+  // Get unique semesters for filter dropdown (ensure First and Second always available)
+  const semesters = [
+    ...new Set(
+      [
+        'first',
+        'second',
+        ...subjects
+          .map(subject => (subject.semester || '').toString().toLowerCase().trim())
+          .filter(Boolean)
+      ]
+    )
+  ];
 
   useEffect(() => {
     fetchSubjects();

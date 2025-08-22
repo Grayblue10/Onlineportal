@@ -4,7 +4,6 @@ import api from '../../services/api';
 import { Button, Input, Card, Modal, Badge, ResponsiveTable, MobileCardList } from '../../components/ui';
 import { 
   Search, 
-  Pencil, 
   Trash2, 
   User, 
   Mail, 
@@ -135,19 +134,9 @@ export default function Teachers() {
     }
   };
 
-  const handleEdit = (teacher) => {
-    setCurrentTeacher(teacher);
-    setFormData({
-      email: teacher.email,
-      password: '', // Don't load password for security
-      fullName: teacher.fullName,
-      employeeId: teacher.employeeId,
-      contactNumber: teacher.contactNumber || '',
-      address: teacher.address || '',
-      isActive: teacher.isActive !== false
-    });
-    setIsEditing(true);
-    setIsModalOpen(true);
+  // Editing is disabled per requirements; keep function but no-op
+  const handleEdit = () => {
+    return;
   };
 
   const handleDelete = async (id) => {
@@ -250,14 +239,6 @@ export default function Teachers() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => handleEdit(teacher)}
-                    title="Edit teacher"
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
                     onClick={() => handleDelete(teacher._id)}
                     className="text-red-600 hover:text-red-800 hover:bg-red-50"
                     title="Delete teacher"
@@ -352,14 +333,6 @@ export default function Teachers() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex justify-end space-x-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleEdit(teacher)}
-                          title="Edit teacher"
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
                         <Button
                           variant="ghost"
                           size="sm"

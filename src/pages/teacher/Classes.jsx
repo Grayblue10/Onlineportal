@@ -22,8 +22,7 @@ export default function TeacherClasses() {
   const [modalLoading, setModalLoading] = useState(false);
   const [filters, setFilters] = useState({
     search: '',
-    semester: '',
-    status: ''
+    semester: ''
   });
 
   const fetchClasses = useCallback(async (isRefresh = false) => {
@@ -209,9 +208,7 @@ export default function TeacherClasses() {
     const matchesSearch = cls.name.toLowerCase().includes(filters.search.toLowerCase()) ||
                          cls.code.toLowerCase().includes(filters.search.toLowerCase());
     const matchesSemester = !filters.semester || cls.semester === filters.semester;
-    const matchesStatus = !filters.status || cls.status === filters.status;
-    
-    return matchesSearch && matchesSemester && matchesStatus;
+    return matchesSearch && matchesSemester;
   });
 
   return (
@@ -241,7 +238,7 @@ export default function TeacherClasses() {
 
       {/* Filters */}
       <Card className="p-4">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="relative">
             <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
             <Input
@@ -264,26 +261,6 @@ export default function TeacherClasses() {
             <option value="First Semester">First Semester</option>
             <option value="Second Semester">Second Semester</option>
           </select>
-          
-          <select
-            name="status"
-            value={filters.status}
-            onChange={handleFilterChange}
-            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teacher-500"
-          >
-            <option value="">All Status</option>
-            <option value="active">Active</option>
-            <option value="upcoming">Upcoming</option>
-            <option value="completed">Completed</option>
-          </select>
-          
-          <Button 
-            variant="secondary" 
-            size="sm"
-            onClick={() => setFilters({ search: '', semester: '', status: '' })}
-          >
-            Clear Filters
-          </Button>
         </div>
       </Card>
 

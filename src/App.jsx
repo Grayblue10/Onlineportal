@@ -22,6 +22,7 @@ import Teachers from './pages/admin/Teachers';
 import StudentEnrollment from './pages/admin/StudentEnrollment';
 import TeacherAssignment from './pages/admin/TeacherAssignment';
 import ProgramEnrollment from './pages/admin/ProgramEnrollment';
+import EnrollmentManagement from './pages/admin/EnrollmentManagement';
 import TeacherDashboard from './pages/teacher/Dashboard';
 import SubjectAssignment from './pages/teacher/SubjectAssignment';
 import EnrolledStudents from './pages/teacher/EnrolledStudents';
@@ -116,6 +117,7 @@ function AppRoutes() {
         <Route path="teachers" element={<Teachers />} />
         <Route path="enrollment" element={<StudentEnrollment />} />
         <Route path="program-enrollment" element={<ProgramEnrollment />} />
+        <Route path="enrollment-management" element={<EnrollmentManagement />} />
         <Route path="assignment" element={<TeacherAssignment />} />
         {/* Nested admin routes */}
       </Route>

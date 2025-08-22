@@ -36,7 +36,7 @@ const Navbar = ({ showMenuButton = false, onMenuClick }) => {
               </button>
             )}
             <Link to="/" className="flex items-center space-x-2 min-w-0">
-              <img src={tracLogo} alt="TRAC Logo" className="h-7 sm:h-8 w-auto flex-shrink-0" />
+              <img src={tracLogo} alt="TRAC Logo" className="h-10 sm:h-12 w-auto flex-shrink-0" />
               <span className="hidden sm:inline text-lg sm:text-xl font-bold text-black truncate">GradingSystem</span>
             </Link>
           </div>

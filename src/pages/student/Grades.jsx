@@ -32,8 +32,16 @@ export default function StudentGrades() {
   // Get unique assessment types for filter dropdown
   const assessmentTypes = [...new Set(grades.map(grade => grade.assessmentType).filter(Boolean))];
   
-  // Get unique semesters for filter dropdown
-  const semesters = [...new Set(grades.map(grade => grade.semester).filter(Boolean))];
+  // Get unique semesters for filter dropdown (ensure First and Second always available)
+  const semesters = [
+    ...new Set([
+      'first',
+      'second',
+      ...grades
+        .map(grade => (grade.semester || '').toString().toLowerCase().trim())
+        .filter(Boolean)
+    ])
+  ];
 
   useEffect(() => {
     fetchGrades();

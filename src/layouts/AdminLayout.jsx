@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import Navbar from '../components/Navbar';
-import { Users, BarChart3, Settings, Shield, GraduationCap, UserPlus, UserCheck, BookOpen } from 'lucide-react';
+import { Users, BarChart3, Settings, Shield, GraduationCap, UserPlus, UserCheck, BookOpen, Scissors } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { Button, Modal } from '../components/ui';
 
@@ -18,6 +18,7 @@ const AdminLayout = () => {
     { name: 'Teachers', href: '/admin/teachers', icon: GraduationCap },
     { name: 'Student Enrollment', href: '/admin/enrollment', icon: UserPlus },
     { name: 'Course Enrollment', href: '/admin/program-enrollment', icon: BookOpen },
+    { name: 'Enrollment Management', href: '/admin/enrollment-management', icon: Scissors },
     { name: 'Teacher Assignment', href: '/admin/assignment', icon: UserCheck },
     { name: 'System Settings', href: '/admin/settings', icon: Settings }
   ];
