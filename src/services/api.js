@@ -9,7 +9,7 @@ const api = axios.create({
     'Content-Type': 'application/json',
   },
   withCredentials: false, // Avoid credentialed requests; we use Authorization header
-  timeout: 15000, // 15s client-side timeout to avoid hanging requests
+  timeout: 30000, // 30s to accommodate Render cold starts and latency
 });
 
 // Add token to requests

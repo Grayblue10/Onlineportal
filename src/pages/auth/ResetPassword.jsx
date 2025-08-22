@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { Lock, CheckCircle, ArrowLeft } from 'lucide-react';
+import { Lock, CheckCircle, ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import Form from '../../components/forms/Form';
 import FormInput from '../../components/forms/FormInput';
@@ -12,6 +12,8 @@ const ResetPassword = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [isSuccess, setIsSuccess] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const token = useMemo(() => {
     if (tokenFromParams) return tokenFromParams;
@@ -103,9 +105,19 @@ const ResetPassword = () => {
           <FormInput
             name="password"
             label="New Password"
-            type="password"
+            type={showPassword ? 'text' : 'password'}
             placeholder="Enter your new password"
             leftIcon={<Lock className="h-5 w-5 text-gray-400" />}
+            rightIcon={
+              <button
+                type="button"
+                className="text-gray-500 hover:text-gray-700"
+                onClick={() => setShowPassword((s) => !s)}
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+              </button>
+            }
             autoComplete="new-password"
             required
           />
@@ -113,9 +125,19 @@ const ResetPassword = () => {
           <FormInput
             name="confirmPassword"
             label="Confirm New Password"
-            type="password"
+            type={showConfirmPassword ? 'text' : 'password'}
             placeholder="Confirm your new password"
             leftIcon={<Lock className="h-5 w-5 text-gray-400" />}
+            rightIcon={
+              <button
+                type="button"
+                className="text-gray-500 hover:text-gray-700"
+                onClick={() => setShowConfirmPassword((s) => !s)}
+                aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
+              >
+                {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+              </button>
+            }
             autoComplete="new-password"
             required
           />

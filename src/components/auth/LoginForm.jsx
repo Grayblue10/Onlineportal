@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { GraduationCap, Lock, Mail, AlertCircle } from 'lucide-react';
+import { GraduationCap, Lock, Mail, AlertCircle, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { toast } from 'react-hot-toast';
 import { useForm } from 'react-hook-form';
@@ -11,6 +11,7 @@ import backgroundImage from '../../assets/images/backgroundimage.jpeg';
 
 const LoginForm = () => {
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -157,7 +158,7 @@ const LoginForm = () => {
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                   <input
-                    type="password"
+                    type={showPassword ? 'text' : 'password'}
                     className="pl-10 w-full rounded-lg border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"
                     placeholder="••••••••"
                     {...register('password', {
@@ -169,6 +170,14 @@ const LoginForm = () => {
                     })}
                     onInput={() => clearErrors(['password', 'form'])}
                   />
+                  <button
+                    type="button"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                    onClick={() => setShowPassword((s) => !s)}
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
                 </div>
                 {errors.password && (
                   <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
-import { GraduationCap, AlertCircle, CheckCircle, ArrowLeft, Lock, Mail, Hash, User } from 'lucide-react';
+import { GraduationCap, AlertCircle, CheckCircle, ArrowLeft, Lock, Mail, Hash, User, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { toast } from 'react-hot-toast';
 import Button from '../ui/Button';
@@ -19,6 +19,8 @@ const RegisterForm = () => {
   const [formSuccess, setFormSuccess] = useState(false);
   const { register: registerUser } = useAuth();
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   
   const {
     register,
@@ -251,47 +253,6 @@ const RegisterForm = () => {
                   <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
                 )}
               </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                    <input
-                      type="password"
-                      className="pl-10 w-full rounded-lg border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 py-2"
-                      placeholder="••••••••"
-                      disabled={isSubmitting}
-                      {...register('password', { required: 'Password is required' })}
-                    />
-                  </div>
-                  {errors.password && (
-                    <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                    <input
-                      type="password"
-                      className="pl-10 w-full rounded-lg border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 py-2"
-                      placeholder="••••••••"
-                      disabled={isSubmitting}
-                      {...register('confirmPassword', { required: 'Please confirm your password' })}
-                    />
-                  </div>
-                  {errors.confirmPassword && (
-                    <p className="mt-1 text-sm text-red-600">{errors.confirmPassword.message}</p>
-                  )}
-                </div>
-              </div>
-
-              <div className="text-center text-xs text-gray-500 mt-1">
-                Must be at least 8 characters with 1 uppercase and 1 number
-              </div>
-
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
                 <select

@@ -22,6 +22,7 @@ const FormInput = forwardRef((
     readOnly = false,
     autoComplete = 'off',
     leftIcon,
+    rightIcon,
     validate, // Extract validate prop to prevent it from being passed to the input element
     ...props
   },
@@ -44,6 +45,11 @@ const FormInput = forwardRef((
             {leftIcon}
           </div>
         )}
+        {rightIcon && (
+          <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
+            {rightIcon}
+          </div>
+        )}
         <Input
           id={inputId}
           ref={ref}
@@ -53,7 +59,7 @@ const FormInput = forwardRef((
           disabled={disabled}
           readOnly={readOnly}
           autoComplete={autoComplete}
-          className={`w-full ${leftIcon ? 'pl-10' : ''} ${error ? 'border-red-500' : ''} ${inputClassName}`}
+          className={`w-full ${leftIcon ? 'pl-10' : ''} ${rightIcon ? 'pr-10' : ''} ${error ? 'border-red-500' : ''} ${inputClassName}`}
           aria-invalid={!!error}
           aria-describedby={error ? `${inputId}-error` : undefined}
           {...props}
@@ -105,6 +111,7 @@ FormInput.propTypes = {
   readOnly: PropTypes.bool,
   autoComplete: PropTypes.string,
   leftIcon: PropTypes.element,
+  rightIcon: PropTypes.element,
   validate: PropTypes.func,
 };
 
