@@ -87,6 +87,14 @@ export default function StudentSubjects() {
           const tr = timeRange(start, end);
           if (days || tr) scheduleValue = `${Array.isArray(days) ? days.join(', ') : (days || '')} ${tr || ''}`.trim();
         }
+        // 3b) rawSchedule from backend
+        if (!scheduleValue && subject.rawSchedule && typeof subject.rawSchedule === 'object') {
+          const rdays = subject.rawSchedule.days || subject.rawSchedule.day || subject.rawSchedule.weekday;
+          const rstart = subject.rawSchedule.start || subject.rawSchedule.startTime || subject.rawSchedule.start_time;
+          const rend = subject.rawSchedule.end || subject.rawSchedule.endTime || subject.rawSchedule.end_time;
+          const rtr = timeRange(rstart, rend);
+          if (rdays || rtr) scheduleValue = `${Array.isArray(rdays) ? rdays.join(', ') : (rdays || '')} ${rtr || ''}`.trim();
+        }
         // 4) schedules array
         if (!scheduleValue && Array.isArray(subject.schedules) && subject.schedules.length > 0) {
           scheduleValue = subject.schedules
@@ -134,6 +142,9 @@ export default function StudentSubjects() {
         if (!roomValue) {
           const e = subject.enrollment || subject.assigned || subject.assignment || subject.section || subject.classInfo;
           roomValue = e?.schedule?.room || e?.room || e?.roomName || e?.room_name || e?.roomNumber || e?.classroom || e?.location || e?.venue || roomValue;
+        }
+        if (!roomValue && subject.rawSchedule) {
+          roomValue = subject.rawSchedule.room || null;
         }
         if (!scheduleValue) {
           console.debug('[StudentSubjects] schedule unresolved for subject id:', subject.id || subject._id, 'available keys:', Object.keys(subject || {}));
