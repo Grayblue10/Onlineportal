@@ -65,26 +65,82 @@ export default function StudentSubjects() {
       const processedSubjects = subjectsData.map((subject, index) => {
         console.log(`[StudentSubjects] Processing subject ${index + 1}:`, subject);
         
-        // Derive schedule from multiple possible fields
-        const scheduleValue =
-          subject.schedule ||
-          subject.time ||
-          subject.scheduleTime ||
-          (subject.scheduleDay && subject.scheduleTime ? `${subject.scheduleDay} ${subject.scheduleTime}` : null) ||
-          (subject.schedule?.day && subject.schedule?.time ? `${subject.schedule.day} ${subject.schedule.time}` : null) ||
-          subject.timetable ||
-          subject.meetingTime ||
-          null;
+        // Helper: format time range
+        const timeRange = (start, end) => {
+          if (!start && !end) return null;
+          return `${start || ''}${start && end ? ' - ' : ''}${end || ''}`.trim();
+        };
 
-        // Derive room from multiple possible fields
-        const roomValue =
-          subject.room ||
-          subject.roomNumber ||
-          subject.classroom ||
-          subject.location ||
-          subject.section?.room ||
-          subject.section?.location ||
-          null;
+        // Derive schedule from multiple possible fields/shapes
+        let scheduleValue = null;
+        // 1) Pre-formatted string fields
+        scheduleValue = scheduleValue || subject.schedule || subject.classSchedule || subject.class_schedule || subject.time || subject.scheduleTime || subject.schedule_time || subject.timetable || subject.meetingTime;
+        // 2) Day + Time combos
+        scheduleValue = scheduleValue || (subject.scheduleDay && subject.scheduleTime ? `${subject.scheduleDay} ${subject.scheduleTime}` : null);
+        scheduleValue = scheduleValue || (subject.schedule_day && subject.schedule_time ? `${subject.schedule_day} ${subject.schedule_time}` : null);
+        scheduleValue = scheduleValue || (subject.schedule?.day && subject.schedule?.time ? `${subject.schedule.day} ${subject.schedule.time}` : null);
+        // 3) Object with days/start/end
+        if (!scheduleValue && subject.schedule && typeof subject.schedule === 'object') {
+          const days = subject.schedule.days || subject.schedule.day || subject.schedule.weekday;
+          const start = subject.schedule.start || subject.schedule.startTime || subject.schedule.start_time;
+          const end = subject.schedule.end || subject.schedule.endTime || subject.schedule.end_time;
+          const tr = timeRange(start, end);
+          if (days || tr) scheduleValue = `${Array.isArray(days) ? days.join(', ') : (days || '')} ${tr || ''}`.trim();
+        }
+        // 4) schedules array
+        if (!scheduleValue && Array.isArray(subject.schedules) && subject.schedules.length > 0) {
+          scheduleValue = subject.schedules
+            .map(it => {
+              const day = it.day || it.days || it.weekday;
+              const tr = timeRange(it.start || it.startTime || it.start_time, it.end || it.endTime || it.end_time);
+              return [Array.isArray(day) ? day.join(', ') : (day || null), tr].filter(Boolean).join(' ');
+            })
+            .filter(Boolean)
+            .join(', ');
+        }
+        // 5) enrollment/classInfo nested
+        if (!scheduleValue) {
+          const e = subject.enrollment || subject.assigned || subject.assignment || subject.classInfo || subject.section;
+          if (e) {
+            // If e.schedule is an object with days/startTime/endTime (Admin StudentEnrollment format)
+            if (e.schedule && typeof e.schedule === 'object') {
+              const edays = e.schedule.days || e.schedule.day || e.schedule.weekday;
+              const etr = timeRange(e.schedule.startTime || e.schedule.start_time || e.schedule.start, e.schedule.endTime || e.schedule.end_time || e.schedule.end);
+              const daysStr = Array.isArray(edays) ? edays.join(', ') : (edays || '');
+              scheduleValue = [daysStr, etr].filter(Boolean).join(' ').trim();
+            }
+            // Fallbacks on enrollment root-level fields
+            if (!scheduleValue) {
+              scheduleValue = e.schedule || e.time || (e.day && e.time ? `${e.day} ${e.time}` : null) || timeRange(e.startTime || e.start_time, e.endTime || e.end_time);
+            }
+            // Array schedules under enrollment
+            if (!scheduleValue && Array.isArray(e.schedules)) {
+              scheduleValue = e.schedules.map(it => {
+                const d = it.day || it.days;
+                const tr = timeRange(it.start || it.startTime || it.start_time, it.end || it.endTime || it.end_time);
+                return [Array.isArray(d) ? d.join(', ') : (d || null), tr].filter(Boolean).join(' ');
+              }).filter(Boolean).join(', ');
+            }
+          }
+        }
+
+        // Derive room from multiple possible fields/nesting
+        let roomValue = null;
+        roomValue = roomValue || subject.room || subject.roomName || subject.room_name || subject.roomNumber || subject.room_number || subject.classroom || subject.class_room || subject.location || subject.venue;
+        roomValue = roomValue || subject.section?.room || subject.section?.location || subject.classInfo?.room || subject.classInfo?.location;
+        if (!roomValue && Array.isArray(subject.schedules) && subject.schedules.length > 0) {
+          roomValue = subject.schedules.find(it => it.room || it.location)?.room || subject.schedules.find(it => it.location)?.location || null;
+        }
+        if (!roomValue) {
+          const e = subject.enrollment || subject.assigned || subject.assignment || subject.section || subject.classInfo;
+          roomValue = e?.schedule?.room || e?.room || e?.roomName || e?.room_name || e?.roomNumber || e?.classroom || e?.location || e?.venue || roomValue;
+        }
+        if (!scheduleValue) {
+          console.debug('[StudentSubjects] schedule unresolved for subject id:', subject.id || subject._id, 'available keys:', Object.keys(subject || {}));
+        }
+        if (!roomValue) {
+          console.debug('[StudentSubjects] room unresolved for subject id:', subject.id || subject._id, 'available keys:', Object.keys(subject || {}));
+        }
 
         return {
           id: subject.id || subject._id || `temp-${index}`,
