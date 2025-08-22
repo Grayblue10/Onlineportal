@@ -265,7 +265,7 @@ const sendWelcomeEmail = async (email, name, role, tempPassword = null) => {
         </p>
         
         <div style="text-align: center; margin: 30px 0;">
-          <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}/login" 
+          <a href="${process.env.FRONTEND_URL || 'https://onlineportal-9rqm.onrender.com'}/login" 
              style="background-color: #3498db; color: white; padding: 12px 30px; 
                     text-decoration: none; border-radius: 5px; display: inline-block;
                     font-weight: bold; font-size: 16px;">
