@@ -166,7 +166,24 @@ export default function TeacherGrades() {
             ? g.percentage
             : (g.maxScore ? Math.round(((g.score || 0) / g.maxScore) * 100) : 0)
         }));
-      setGrades(processed);
+
+      // Deduplicate by student+subject(or class)+semester, keep most recent by updatedAt/gradedAt
+      const dedupMap = new Map();
+      for (const g of processed) {
+        const key = [
+          g.student?._id || g.student?.id || g.student,
+          // prefer subject code/name, fallback to class id
+          g.subject?.code || g.subject?._id || g.subject?.name || g.class?._id || g.class?.id || g.class,
+          g.semester
+        ].join('|');
+        const existing = dedupMap.get(key);
+        const gTime = new Date(g.updatedAt || g.gradedAt || 0).getTime();
+        const eTime = new Date(existing?.updatedAt || existing?.gradedAt || 0).getTime();
+        if (!existing || gTime >= eTime) {
+          dedupMap.set(key, g);
+        }
+      }
+      setGrades([...dedupMap.values()]);
       console.log('[TeacherGrades] Grades loaded:', processed.length);
       
     } catch (error) {
@@ -280,6 +297,14 @@ export default function TeacherGrades() {
               isFinal: true
             };
             await teacherService.updateStudentGradeByStudentId(gradeFormData.studentId, altPayload);
+            // Best-effort: delete the old grade doc to avoid duplicates in listings
+            if (updateId) {
+              try {
+                await teacherService.deleteGrade(updateId);
+              } catch (delErr) {
+                console.warn('[Grades] Failed to delete legacy grade after fallback update:', delErr?.response?.data || delErr?.message);
+              }
+            }
           } else {
             throw err;
           }
