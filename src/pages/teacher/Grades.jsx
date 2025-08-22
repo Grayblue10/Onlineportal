@@ -92,9 +92,11 @@ export default function TeacherGrades() {
       ]);
       
       // Handle classes response
+      let classesList = [];
       if (classesResponse.status === 'fulfilled') {
-        // teacherService returns parsed data already
-        setClasses(classesResponse.value || []);
+        const rawClasses = classesResponse.value?.data ?? classesResponse.value;
+        classesList = Array.isArray(rawClasses) ? rawClasses : (Array.isArray(rawClasses?.data) ? rawClasses.data : []);
+        setClasses(classesList);
       } else {
         console.error('[TeacherGrades] Error fetching classes:', classesResponse.reason);
         toast.error('Failed to load classes');
@@ -107,7 +109,7 @@ export default function TeacherGrades() {
         setSubjects(list);
       } else {
         console.warn('[TeacherGrades] Subjects API unavailable, deriving from classes');
-        const unique = [...new Map((classesResponse.status === 'fulfilled' ? (classesResponse.value || []) : [])
+        const unique = [...new Map((classesList || [])
           .filter(c => c.subject)
           .map(c => [c.subject.code || c.subject.name, c.subject])
         ).values()];
@@ -116,7 +118,9 @@ export default function TeacherGrades() {
       
       // Handle students response
       if (studentsResponse.status === 'fulfilled') {
-        setStudents(studentsResponse.value || []);
+        const rawStudents = studentsResponse.value?.data ?? studentsResponse.value;
+        const studentsList = Array.isArray(rawStudents) ? rawStudents : (Array.isArray(rawStudents?.data) ? rawStudents.data : []);
+        setStudents(studentsList);
       } else {
         console.warn('[TeacherGrades] getStudents() failed, attempting fallback to getEnrolledStudents()', studentsResponse.reason);
         try {
