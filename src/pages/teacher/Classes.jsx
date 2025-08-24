@@ -205,8 +205,20 @@ export default function TeacherClasses() {
 
   // Apply filters to classes
   const filteredClasses = classes.filter(cls => {
-    const matchesSearch = cls.name.toLowerCase().includes(filters.search.toLowerCase()) ||
-                         cls.code.toLowerCase().includes(filters.search.toLowerCase());
+    const q = (filters.search || '').toLowerCase().trim();
+    const name = (cls.name || '').toLowerCase();
+    const code = (cls.code || '').toLowerCase();
+    const subject = (cls.subject || '').toLowerCase();
+    const semesterText = (cls.semester || '').toLowerCase();
+    const room = (cls.room || '').toLowerCase();
+
+    const matchesSearch = !q ||
+      name.includes(q) ||
+      code.includes(q) ||
+      subject.includes(q) ||
+      semesterText.includes(q) ||
+      room.includes(q);
+
     const matchesSemester = !filters.semester || cls.semester === filters.semester;
     return matchesSearch && matchesSemester;
   });
@@ -242,6 +254,7 @@ export default function TeacherClasses() {
           <div className="relative">
             <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
             <Input
+              id="teacher-classes-search"
               type="text"
               name="search"
               placeholder="Search classes..."

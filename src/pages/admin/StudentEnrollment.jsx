@@ -74,7 +74,10 @@ const StudentEnrollment = () => {
         // Normalize stats payload to a consistent shape
         const rawStats = statsResponse?.data?.data ?? statsResponse?.data ?? null;
         const normalizedStats = rawStats ? {
+          // Prefer classes with an assigned teacher if available to reflect assignment status accurately
           totalClasses: (
+            rawStats?.overview?.classesWithTeacher ??
+            rawStats?.classesWithTeacher ??
             rawStats?.overview?.totalClasses ??
             rawStats?.totalClasses ??
             rawStats?.classesCount ??
@@ -186,6 +189,8 @@ const StudentEnrollment = () => {
       const rawStats = statsResponse?.data?.data ?? statsResponse?.data ?? null;
       const normalizedStats = rawStats ? {
         totalClasses: (
+          rawStats?.overview?.classesWithTeacher ??
+          rawStats?.classesWithTeacher ??
           rawStats?.overview?.totalClasses ??
           rawStats?.totalClasses ??
           rawStats?.classesCount ??

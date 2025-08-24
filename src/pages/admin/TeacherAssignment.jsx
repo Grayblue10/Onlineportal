@@ -14,7 +14,7 @@ const TeacherAssignment = () => {
   const [academicYear, setAcademicYear] = useState(new Date().getFullYear());
   const [loading, setLoading] = useState(false);
   const [assigning, setAssigning] = useState(false);
-  const [deleteIfEmpty, setDeleteIfEmpty] = useState(false);
+  const [deleteIfEmpty, setDeleteIfEmpty] = useState(true);
   const [unassigning, setUnassigning] = useState(false);
 
   // Fetch teachers and subjects
