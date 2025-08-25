@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { toast } from 'react-hot-toast';
-import { Users, Book, Mail, AlertTriangle, CheckCircle } from 'lucide-react';
+import { Users, Book, Mail, AlertTriangle, CheckCircle, GraduationCap } from 'lucide-react';
 import teacherService from '../../services/teacherService';
 import Card from '../../components/ui/Card';
 import Spinner from '../../components/ui/Spinner';
@@ -193,9 +193,13 @@ const EnrolledStudents = () => {
                               </div>
                               <div>
                                 <p className="font-medium text-gray-900">{student.name}</p>
-                                <div className="flex items-center text-sm text-gray-500">
-                                  <Mail className="h-3 w-3 mr-1" />
-                                  {student.email}
+                                <div className="flex items-center gap-2 text-sm text-gray-500">
+                                  <span className="inline-flex items-center"><Mail className="h-3 w-3 mr-1" />{student.email}</span>
+                                  {typeof student.yearLevel !== 'undefined' && (
+                                    <span className="inline-flex items-center px-1.5 py-0.5 text-[11px] rounded-md border border-yellow-300 bg-yellow-50 text-yellow-700">
+                                      <GraduationCap className="w-3 h-3 mr-1" /> Y{student.yearLevel}
+                                    </span>
+                                  )}
                                 </div>
                               </div>
                             </div>
@@ -256,6 +260,11 @@ const EnrolledStudents = () => {
                                     <div>
                                       <p className="font-medium text-gray-900">{student.name}</p>
                                       <div className="flex items-center text-sm text-gray-500"><Mail className="h-3 w-3 mr-1" />{student.email}</div>
+                                      {typeof student.yearLevel !== 'undefined' && (
+                                        <span className="inline-flex items-center px-1.5 py-0.5 text-[11px] rounded-md border border-yellow-300 bg-yellow-50 text-yellow-700">
+                                          <GraduationCap className="w-3 h-3 mr-1" /> Y{student.yearLevel}
+                                        </span>
+                                      )}
                                     </div>
                                   </div>
                                   <span className="text-xs text-gray-400">#{index + 1}</span>

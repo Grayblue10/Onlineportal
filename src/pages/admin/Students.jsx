@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Search, Users, CheckCircle2, XCircle, Loader2, CreditCard, Mail, Hash, BookOpen, User2, Trash2 } from 'lucide-react';
+import { Search, Users, CheckCircle2, XCircle, Loader2, CreditCard, Mail, Hash, BookOpen, User2, Trash2, GraduationCap } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { Card } from '../../components/ui';
 import adminEnrollmentService from '../../services/adminEnrollmentService';
@@ -13,6 +13,7 @@ const Students = () => {
   const [selected, setSelected] = useState(null);
   const [enrollments, setEnrollments] = useState([]);
   const [loadingDetails, setLoadingDetails] = useState(false);
+  const [savingYear, setSavingYear] = useState(false);
   // All students list (bottom)
   const [allStudents, setAllStudents] = useState([]);
   const [page, setPage] = useState(1);
@@ -51,6 +52,29 @@ const Students = () => {
     debounced(q);
   };
 
+  const applyYearLevelLocal = (id, yearLevel) => {
+    setSelected(prev => prev ? ({ ...prev, yearLevel }) : prev);
+    setResults(prev => prev.map(r => ((r._id || r.id) === id ? { ...r, yearLevel } : r)));
+    setAllStudents(prev => prev.map(r => ((r._id || r.id) === id ? { ...r, yearLevel } : r)));
+  };
+
+  const handleYearLevelChange = async (e) => {
+    const val = Number(e.target.value);
+    if (!selected || !val) return;
+    const id = selected._id || selected.id;
+    try {
+      setSavingYear(true);
+      await adminEnrollmentService.updateUser(id, { yearLevel: val });
+      applyYearLevelLocal(id, val);
+      toast.success('Year level updated');
+    } catch (err) {
+      console.error('[Admin Students] Failed to update year level', err);
+      toast.error('Failed to update year level');
+    } finally {
+      setSavingYear(false);
+    }
+  };
+
   const selectStudent = async (s) => {
     setSelected(s);
     // Attempt to fetch enrolled subjects for the selected student
@@ -78,8 +102,12 @@ const Students = () => {
         })()
       ]);
       setEnrollments(Array.isArray(enrData) ? enrData : (enrData?.enrollments || []));
-      if (detailed && detailed.program) {
-        setSelected(prev => ({ ...prev, program: detailed.program }));
+      if (detailed) {
+        setSelected(prev => ({
+          ...prev,
+          ...(detailed.program ? { program: detailed.program } : {}),
+          ...(detailed.yearLevel ? { yearLevel: detailed.yearLevel } : {})
+        }));
       }
     } catch (err) {
       console.error('[Admin Students] failed to load enrollments/profile', err);
@@ -191,6 +219,7 @@ const Students = () => {
                   <div className="flex items-center gap-3 mt-1 text-xs text-gray-500">
                     <span className="inline-flex items-center gap-1"><CreditCard className="h-3 w-3" />{studentNumber(s) || '—'}</span>
                     {s.program && <span>{typeof s.program === 'string' ? s.program : s.program?.code}</span>}
+                    <span className="inline-flex items-center gap-1"><GraduationCap className="h-3 w-3" />Y{s.yearLevel || s.year || '—'}</span>
                     {s.department && <span>{s.department}</span>}
                   </div>
                 </div>
@@ -233,6 +262,35 @@ const Students = () => {
                   <div>
                     <div className="text-sm text-gray-500">Student Number</div>
                     <div className="font-medium text-gray-900 break-all">{studentNumber(selected) || '—'}</div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 py-2">
+                  <div className="w-9 h-9 flex items-center justify-center rounded-lg bg-yellow-50 text-yellow-700">
+                    <GraduationCap size={18} />
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div>
+                      <div className="text-sm text-gray-500">Year Level</div>
+                      <div className="font-medium text-gray-900 break-all">
+                        <select
+                          className="border rounded px-2 py-1 text-sm"
+                          value={selected?.yearLevel || ''}
+                          onChange={handleYearLevelChange}
+                          disabled={savingYear}
+                        >
+                          <option value="" disabled>Select</option>
+                          <option value="1">1</option>
+                          <option value="2">2</option>
+                          <option value="3">3</option>
+                          <option value="4">4</option>
+                        </select>
+                      </div>
+                    </div>
+                    {savingYear && (
+                      <span className="text-xs text-gray-500 flex items-center gap-1">
+                        <Loader2 className="h-3 w-3 animate-spin" /> Saving...
+                      </span>
+                    )}
                   </div>
                 </div>
                 <div className="flex items-center gap-3 py-2">
@@ -319,7 +377,7 @@ const Students = () => {
                   </div>
                   <div>
                     <div className="font-medium text-gray-900 text-sm">{displayName(u)}</div>
-                    <div className="text-xs text-gray-600">{u.email || '—'} • {studentNumber(u) || '—'}</div>
+                    <div className="text-xs text-gray-600">{u.email || '—'} • {studentNumber(u) || '—'} • Y{u.yearLevel || '—'}</div>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">

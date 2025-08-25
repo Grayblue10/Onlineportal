@@ -16,7 +16,8 @@ const transformUserData = (user) => {
     role: user.role || 'student',
     isActive: user.isActive !== false,
     ...(user.studentId && { studentId: user.studentId }),
-    ...(user.employeeId && { employeeId: user.employeeId })
+    ...(user.employeeId && { employeeId: user.employeeId }),
+    ...(typeof user.yearLevel !== 'undefined' ? { yearLevel: user.yearLevel } : {})
   };
 };
 

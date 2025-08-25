@@ -52,6 +52,12 @@ const Navbar = ({ showMenuButton = false, onMenuClick }) => {
               </div>
             </div>
 
+            {isStudent && typeof user?.yearLevel !== 'undefined' && (
+              <span className="hidden sm:inline-flex items-center px-2 py-1 text-xs rounded-md border border-yellow-300 bg-yellow-50 text-yellow-700">
+                Year: Y{user.yearLevel}
+              </span>
+            )}
+
             <div className="flex items-center space-x-2">
               <button
                 onClick={logout}

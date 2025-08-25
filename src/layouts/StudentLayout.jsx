@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import Navbar from '../components/Navbar';
-import { BookOpen, Award, User } from 'lucide-react';
+import { BookOpen, Award, User, GraduationCap } from 'lucide-react';
+import { useAuth } from '../hooks/useAuth';
 
 const StudentLayout = () => {
   const location = useLocation();
+  const { user } = useAuth();
   // Sidebar open state across all breakpoints
   const [mobileOpen, setMobileOpen] = useState(true);
   
@@ -35,6 +37,11 @@ const StudentLayout = () => {
                 Student Portal
               </h2>
               <div className="w-12 h-1 rounded-full bg-yellow-500"></div>
+              {typeof user?.yearLevel !== 'undefined' && (
+                <div className="mt-3 inline-flex items-center gap-1 text-xs text-yellow-700 bg-yellow-50 border border-yellow-200 px-2 py-1 rounded-md">
+                  <GraduationCap className="w-3 h-3" /> Year: Y{user.yearLevel}
+                </div>
+              )}
             </div>
             <nav className="space-y-2">
               {sidebarItems.map((item) => {

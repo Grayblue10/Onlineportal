@@ -23,6 +23,12 @@ const adminEnrollmentService = {
     return resp.data;
   },
 
+  // Update a user by ID (e.g., yearLevel, name, etc.)
+  updateUser: async (userId, payload) => {
+    const resp = await api.put(`/api/admin/users/${userId}`, payload);
+    return resp.data?.data ?? resp.data;
+  },
+
   // Fetch enrollments for a specific student. Try multiple shapes/endpoints.
   getStudentEnrollments: async (studentId) => {
     // Preferred: RESTful nested route
