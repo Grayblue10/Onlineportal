@@ -45,7 +45,10 @@ export default defineConfig({
         msg.includes('hmr update') || 
         msg.includes('hot updated')
       )) return
-      console.log(msg, options)
+      // Skip clear-screen banner control logs
+      if (options && options.clear) return
+      // Only log the message to avoid printing 'undefined' or objects
+      console.log(msg)
     },
     warn: (msg, options) => {
       // Filter out common warnings
@@ -53,7 +56,8 @@ export default defineConfig({
         msg.includes('Sourcemap for') || 
         msg.includes('React Router Future Flag Warning')
       )) return
-      console.warn(msg, options)
+      // Only log the message
+      console.warn(msg)
     },
     error: (msg, options) => {
       // Filter out WebSocket connection errors
@@ -61,7 +65,8 @@ export default defineConfig({
         msg.includes('WebSocket connection to') ||
         msg.includes('server connection lost')
       )) return
-      console.error(msg, options)
+      // Only log the message
+      console.error(msg)
     },
   },
 })
