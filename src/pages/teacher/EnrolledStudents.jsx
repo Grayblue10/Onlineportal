@@ -15,6 +15,10 @@ const EnrolledStudents = () => {
     try {
       setLoading(true);
       console.log('[EnrolledStudents] Fetching enrolled students');
+      // Invalidate cached data to avoid showing stale capacity values
+      if (teacherService?.clearCache) {
+        teacherService.clearCache('enrolled_students');
+      }
       const response = await teacherService.getEnrolledStudents();
       console.log('[EnrolledStudents] Enrollment response:', response);
       
