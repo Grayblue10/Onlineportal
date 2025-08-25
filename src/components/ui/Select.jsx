@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 import { twMerge } from 'tailwind-merge';
 import { ChevronDown, Check } from 'lucide-react';
@@ -20,6 +21,8 @@ const Select = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const selectRef = useRef(null);
+  const buttonRef = useRef(null);
+  const [menuStyle, setMenuStyle] = useState({ top: 0, left: 0, width: 0 });
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -37,9 +40,21 @@ const Select = ({
 
   const selectedOption = options.find(option => option.value === value) || null;
 
+  // Compute and set the menu position relative to viewport
+  const updateMenuPosition = () => {
+    if (!buttonRef.current) return;
+    const rect = buttonRef.current.getBoundingClientRect();
+    setMenuStyle({ top: rect.bottom + window.scrollY, left: rect.left + window.scrollX, width: rect.width });
+  };
+
   const toggleDropdown = () => {
     if (!disabled) {
-      setIsOpen(!isOpen);
+      const next = !isOpen;
+      setIsOpen(next);
+      if (next) {
+        // opening
+        updateMenuPosition();
+      }
     }
   };
 
@@ -47,6 +62,19 @@ const Select = ({
     onChange(option.value);
     setIsOpen(false);
   };
+
+  // Reposition on open, resize, or scroll
+  useEffect(() => {
+    if (!isOpen) return;
+    updateMenuPosition();
+    const handle = () => updateMenuPosition();
+    window.addEventListener('resize', handle);
+    window.addEventListener('scroll', handle, true);
+    return () => {
+      window.removeEventListener('resize', handle);
+      window.removeEventListener('scroll', handle, true);
+    };
+  }, [isOpen]);
 
   return (
     <div className={`w-full ${className}`} ref={selectRef}>
@@ -71,6 +99,7 @@ const Select = ({
           aria-expanded={isOpen}
           aria-labelledby="listbox-label"
           {...props}
+          ref={buttonRef}
         >
           <span className={`block truncate ${!selectedOption ? 'text-gray-500' : ''}`}>
             {selectedOption ? selectedOption.label : placeholder}
@@ -80,52 +109,57 @@ const Select = ({
           </span>
         </button>
 
-        {isOpen && (
-          <div className="absolute z-10 mt-1 w-full rounded-md bg-white shadow-lg">
-            <ul
-              tabIndex={-1}
-              role="listbox"
-              className="max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm"
+        {isOpen && ReactDOM.createPortal(
+          (
+            <div
+              className="fixed z-[9999] mt-1 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5"
+              style={{ top: `${menuStyle.top}px`, left: `${menuStyle.left}px`, width: `${menuStyle.width}px` }}
             >
-              {options.map((option) => (
-                <li
-                  key={option.value}
-                  className={twMerge(
-                    'text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-blue-50',
-                    option.disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
-                  )}
-                  onClick={() => !option.disabled && handleSelect(option)}
-                  role="option"
-                  aria-selected={value === option.value}
-                >
-                  <div className="flex items-center">
-                    {option.icon && (
-                      <span className="mr-3">
-                        {React.cloneElement(option.icon, {
-                          className: 'h-5 w-5 text-gray-400',
-                          'aria-hidden': 'true'
-                        })}
-                      </span>
+              <ul
+                tabIndex={-1}
+                role="listbox"
+                className="max-h-60 rounded-md py-1 text-base overflow-auto focus:outline-none sm:text-sm"
+              >
+                {options.map((option) => (
+                  <li
+                    key={option.value}
+                    className={twMerge(
+                      'text-gray-900 select-none relative py-2 pl-3 pr-9 hover:bg-blue-50',
+                      option.disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
                     )}
-                    <span className="block truncate">
-                      {option.label}
-                    </span>
-                    {value === option.value && (
-                      <span className="absolute inset-y-0 right-0 flex items-center pr-4 text-blue-600">
-                        <Check className="h-5 w-5" aria-hidden="true" />
+                    onClick={() => !option.disabled && handleSelect(option)}
+                    role="option"
+                    aria-selected={value === option.value}
+                  >
+                    <div className="flex items-center">
+                      {option.icon && (
+                        <span className="mr-3">
+                          {React.cloneElement(option.icon, {
+                            className: 'h-5 w-5 text-gray-400',
+                            'aria-hidden': 'true'
+                          })}
+                        </span>
+                      )}
+                      <span className="block truncate">
+                        {option.label}
                       </span>
-                    )}
-                  </div>
-                </li>
-              ))}
-              
-              {options.length === 0 && (
-                <li className="text-gray-500 text-center py-2 px-3">
-                  No options available
-                </li>
-              )}
-            </ul>
-          </div>
+                      {value === option.value && (
+                        <span className="absolute inset-y-0 right-0 flex items-center pr-4 text-blue-600">
+                          <Check className="h-5 w-5" aria-hidden="true" />
+                        </span>
+                      )}
+                    </div>
+                  </li>
+                ))}
+                {options.length === 0 && (
+                  <li className="text-gray-500 text-center py-2 px-3">
+                    No options available
+                  </li>
+                )}
+              </ul>
+            </div>
+          ),
+          document.body
         )}
       </div>
       
