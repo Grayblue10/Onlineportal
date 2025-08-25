@@ -731,7 +731,14 @@ export default function TeacherGrades() {
             <Select
               label="Student"
               aria-label="Select Student"
-              options={students.map(s => ({ value: s._id, label: `${s.firstName} ${s.lastName}${s.studentId ? ` (${s.studentId})` : ''}` }))}
+              options={(gradeFormData.classId || filters.class ? filteredStudents : students).map(s => {
+                const id = s?._id || s?.id || s?.studentId || s?.student_id || '';
+                const first = s?.firstName || s?.firstname || s?.givenName || s?.name?.first || s?.user?.firstName || '';
+                const last = s?.lastName || s?.lastname || s?.familyName || s?.name?.last || s?.user?.lastName || '';
+                const code = s?.studentId || s?.student_id || s?.student_no || s?.studentNumber || '';
+                const label = [first, last].filter(Boolean).join(' ') || s?.fullName || s?.name || 'Unnamed Student';
+                return { value: id, label: code ? `${label} (${code})` : label };
+              })}
               value={gradeFormData.studentId}
               onChange={(val) => setGradeFormData(prev => ({ ...prev, studentId: val }))}
               disabled={loading}
@@ -739,7 +746,15 @@ export default function TeacherGrades() {
             <Select
               label="Class"
               aria-label="Select Class"
-              options={classes.map(c => ({ value: c._id, label: `${c.name}${c.section ? ` - ${c.section}` : ''}` }))}
+              options={classes.map(c => {
+                const id = c?._id || c?.id || c?.classId || '';
+                const name = c?.name || c?.className || c?.sectionName || '';
+                const section = c?.section || c?.sectionName || '';
+                const grade = c?.gradeLevel || c?.level || '';
+                const subjectName = c?.subject?.name || c?.subjectName || '';
+                const labelParts = [name || [grade, section].filter(Boolean).join(' '), subjectName].filter(Boolean);
+                return { value: id, label: labelParts.join(' - ') || 'Unnamed Class' };
+              })}
               value={gradeFormData.classId}
               onChange={(val) => setGradeFormData(prev => ({ ...prev, classId: val }))}
               disabled={loading}
