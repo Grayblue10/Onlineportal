@@ -4,7 +4,7 @@ import { Loader2, CheckCircle, Search, UserPlus, ChevronDown } from 'lucide-reac
 import { Button, Card } from '../../components/ui';
 import api from '../../services/api';
 import { debounce } from 'lodash';
-
+import { formatAcademicYear, getStartYear } from '../../utils/academicYear';
 
 const ProgramEnrollment = () => {
   // Static list of programs/courses (no subject names)
@@ -32,6 +32,15 @@ const ProgramEnrollment = () => {
     const y = new Date().getFullYear();
     return `${y}-${y + 1}`;
   });
+  const yearOptions = useMemo(() => {
+    const now = new Date().getFullYear();
+    const start = now - 5;
+    const list = Array.from({ length: 8 }, (_, i) => {
+      const y = start + i;
+      return `${y}-${y + 1}`;
+    });
+    return list.reverse();
+  }, []);
 
   // Single-select dropdown state
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -67,35 +76,6 @@ const ProgramEnrollment = () => {
     }, 300),
     []
   );
-
-  // Helpers: format/display YYYY-YYYY and extract start year for API
-  const formatAcademicYear = (val) => {
-    if (!val) {
-      const y = new Date().getFullYear();
-      return `${y}-${y + 1}`;
-    }
-    const str = String(val).trim();
-    const mFull = str.match(/^(\d{4})\s*[-\/]\s*(\d{4})$/);
-    if (mFull) return `${mFull[1]}-${mFull[2]}`;
-    const mShort = str.match(/^(\d{4})\s*[-\/]\s*(\d{2})$/);
-    if (mShort) {
-      const start = parseInt(mShort[1], 10);
-      return `${start}-${start + 1}`;
-    }
-    const mSingle = str.match(/^(\d{4})$/);
-    if (mSingle) {
-      const start = parseInt(mSingle[1], 10);
-      return `${start}-${start + 1}`;
-    }
-    const y = new Date().getFullYear();
-    return `${y}-${y + 1}`;
-  };
-
-  const getStartYear = (sy) => {
-    const str = formatAcademicYear(sy);
-    const m = str.match(/^(\d{4})-\d{4}$/);
-    return m ? parseInt(m[1], 10) : new Date().getFullYear();
-  };
 
   const handleSearchChange = (e) => {
     const q = e.target.value;
@@ -245,15 +225,16 @@ const ProgramEnrollment = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Academic Year</label>
-                <input
-                  type="text"
-                  value={academicYear}
+                <select
+                  value={formatAcademicYear(academicYear)}
                   onChange={(e) => setAcademicYear(e.target.value)}
-                  onBlur={(e) => setAcademicYear(formatAcademicYear(e.target.value))}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent"
                   style={{ '--tw-ring-color': 'var(--deep-blue)' }}
-                  placeholder="YYYY-YYYY"
-                />
+                >
+                  {yearOptions.map((sy) => (
+                    <option key={sy} value={sy}>{sy}</option>
+                  ))}
+                </select>
               </div>
             </div>
           </div>

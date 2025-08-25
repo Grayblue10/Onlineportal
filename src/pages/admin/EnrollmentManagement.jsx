@@ -4,6 +4,7 @@ import { toast } from 'react-hot-toast';
 import { Button, Card, Modal } from '../../components/ui';
 import { debounce } from 'lodash';
 import adminEnrollmentService from '../../services/adminEnrollmentService';
+import { formatAcademicYear, getStartYear } from '../../utils/academicYear';
 
 const EnrollmentManagement = () => {
   const [query, setQuery] = useState('');
@@ -15,34 +16,7 @@ const EnrollmentManagement = () => {
   const [confirm, setConfirm] = useState({ open: false, enrollment: null });
   const [deleting, setDeleting] = useState(false);
 
-  // Helpers: format/display YYYY-YYYY and extract start year for API
-  const formatAcademicYear = (val) => {
-    if (!val) {
-      const y = new Date().getFullYear();
-      return `${y}-${y + 1}`;
-    }
-    const str = String(val).trim();
-    const mFull = str.match(/^(\d{4})\s*[-\/]\s*(\d{4})$/);
-    if (mFull) return `${mFull[1]}-${mFull[2]}`;
-    const mShort = str.match(/^(\d{4})\s*[-\/]\s*(\d{2})$/);
-    if (mShort) {
-      const start = parseInt(mShort[1], 10);
-      return `${start}-${start + 1}`;
-    }
-    const mSingle = str.match(/^(\d{4})$/);
-    if (mSingle) {
-      const start = parseInt(mSingle[1], 10);
-      return `${start}-${start + 1}`;
-    }
-    const y = new Date().getFullYear();
-    return `${y}-${y + 1}`;
-  };
-
-  const getStartYear = (sy) => {
-    const str = formatAcademicYear(sy);
-    const m = str.match(/^(\d{4})-\d{4}$/);
-    return m ? parseInt(m[1], 10) : new Date().getFullYear();
-  };
+  // Helpers moved to shared util in `src/utils/academicYear.js`
 
   const doSearch = useCallback(
     debounce(async (q) => {
