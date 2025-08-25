@@ -725,6 +725,40 @@ export default function TeacherGrades() {
         onClose={() => !loading && setIsModalOpen(false)}
         title={`${isEditing ? 'Edit' : 'Add New'} Final Grade`}
         size="lg"
+      >
+        <form onSubmit={handleSubmit} className="pt-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Select
+              label="Student"
+              aria-label="Select Student"
+              options={students.map(s => ({ value: s._id, label: `${s.firstName} ${s.lastName}${s.studentId ? ` (${s.studentId})` : ''}` }))}
+              value={gradeFormData.studentId}
+              onChange={(val) => setGradeFormData(prev => ({ ...prev, studentId: val }))}
+              disabled={loading}
+            />
+            <Select
+              label="Class"
+              aria-label="Select Class"
+              options={classes.map(c => ({ value: c._id, label: `${c.name}${c.section ? ` - ${c.section}` : ''}` }))}
+              value={gradeFormData.classId}
+              onChange={(val) => setGradeFormData(prev => ({ ...prev, classId: val }))}
+              disabled={loading}
+            />
+            <Select
+              label="Semester"
+              aria-label="Select Semester"
+              options={[
+                { value: 'first', label: 'First Semester' },
+                { value: 'second', label: 'Second Semester' },
+              ]}
+              value={gradeFormData.semester}
+              onChange={(val) => setGradeFormData(prev => ({ ...prev, semester: val }))}
+              disabled={loading}
+            />
+            <Input
+              label="Final Grade"
+              name="score"
+              type="number"
               step="0.25"
               value={gradeFormData.score}
               onChange={handleInputChange}
@@ -732,10 +766,12 @@ export default function TeacherGrades() {
               min="1"
               max="5"
               disabled={loading}
+              aria-label="Final grade from 1.00 to 5.00"
+              placeholder="e.g., 1.25"
             />
-            
-            {/* Notes removed from form */}
           </div>
+          
+          {/* Notes removed from form */}
           
           <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200 mt-6">
             <Button

@@ -1,7 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  // Dark mode disabled per design direction
-  darkMode: false,
+  // Dark mode not used; 'media' avoids config deprecation warnings
+  darkMode: 'media',
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
