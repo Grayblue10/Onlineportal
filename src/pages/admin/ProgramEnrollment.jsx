@@ -28,7 +28,10 @@ const ProgramEnrollment = () => {
   // Enrollment fields
   const [selectedProgram, setSelectedProgram] = useState(null); // program code string
   const [semester, setSemester] = useState('first');
-  const [academicYear, setAcademicYear] = useState(new Date().getFullYear());
+  const [academicYear, setAcademicYear] = useState(() => {
+    const y = new Date().getFullYear();
+    return `${y}-${y + 1}`;
+  });
 
   // Single-select dropdown state
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -64,6 +67,35 @@ const ProgramEnrollment = () => {
     }, 300),
     []
   );
+
+  // Helpers: format/display YYYY-YYYY and extract start year for API
+  const formatAcademicYear = (val) => {
+    if (!val) {
+      const y = new Date().getFullYear();
+      return `${y}-${y + 1}`;
+    }
+    const str = String(val).trim();
+    const mFull = str.match(/^(\d{4})\s*[-\/]\s*(\d{4})$/);
+    if (mFull) return `${mFull[1]}-${mFull[2]}`;
+    const mShort = str.match(/^(\d{4})\s*[-\/]\s*(\d{2})$/);
+    if (mShort) {
+      const start = parseInt(mShort[1], 10);
+      return `${start}-${start + 1}`;
+    }
+    const mSingle = str.match(/^(\d{4})$/);
+    if (mSingle) {
+      const start = parseInt(mSingle[1], 10);
+      return `${start}-${start + 1}`;
+    }
+    const y = new Date().getFullYear();
+    return `${y}-${y + 1}`;
+  };
+
+  const getStartYear = (sy) => {
+    const str = formatAcademicYear(sy);
+    const m = str.match(/^(\d{4})-\d{4}$/);
+    return m ? parseInt(m[1], 10) : new Date().getFullYear();
+  };
 
   const handleSearchChange = (e) => {
     const q = e.target.value;
@@ -101,7 +133,7 @@ const ProgramEnrollment = () => {
         studentId: selectedStudent.id,
         programCode: selectedProgram,
         semester,
-        academicYear,
+        academicYear: getStartYear(academicYear),
       };
       const res = await api.post('/api/admin/students/program', payload);
       const updated = res.data?.data;
@@ -214,11 +246,13 @@ const ProgramEnrollment = () => {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Academic Year</label>
                 <input
-                  type="number"
+                  type="text"
                   value={academicYear}
-                  onChange={(e) => setAcademicYear(parseInt(e.target.value))}
+                  onChange={(e) => setAcademicYear(e.target.value)}
+                  onBlur={(e) => setAcademicYear(formatAcademicYear(e.target.value))}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent"
                   style={{ '--tw-ring-color': 'var(--deep-blue)' }}
+                  placeholder="YYYY-YYYY"
                 />
               </div>
             </div>

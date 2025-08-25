@@ -20,6 +20,33 @@ const Profile = () => {
   const [profile, setProfile] = useState(null);
   const [subjects, setSubjects] = useState([]);
 
+  // Normalize/format academic year (SY) to YYYY-YYYY
+  const formatAcademicYear = (val) => {
+    if (!val) {
+      const y = new Date().getFullYear();
+      return `${y}-${y + 1}`;
+    }
+    const str = String(val).trim();
+    // Already YYYY-YYYY
+    const mFull = str.match(/^(\d{4})\s*[-\/]\s*(\d{4})$/);
+    if (mFull) return `${mFull[1]}-${mFull[2]}`;
+    // YYYY-YY
+    const mShort = str.match(/^(\d{4})\s*[-\/]\s*(\d{2})$/);
+    if (mShort) {
+      const start = parseInt(mShort[1], 10);
+      return `${start}-${start + 1}`;
+    }
+    // Single YYYY
+    const mSingle = str.match(/^(\d{4})$/);
+    if (mSingle) {
+      const start = parseInt(mSingle[1], 10);
+      return `${start}-${start + 1}`;
+    }
+    // Fallback
+    const y = new Date().getFullYear();
+    return `${y}-${y + 1}`;
+  };
+
   useEffect(() => {
     let mounted = true;
     const load = async () => {
@@ -72,7 +99,7 @@ const Profile = () => {
           <div className="mt-6 space-y-2">
             <InfoRow icon={Hash} label="Student Number" value={profile?.studentId} />
             <InfoRow icon={Mail} label="Email" value={profile?.email} />
-            <InfoRow icon={GraduationCap} label="Program" value={profile?.program ? `${profile.program.code} • ${profile.program.semester} sem • ${profile.program.academicYear}` : 'Not assigned'} />
+            <InfoRow icon={GraduationCap} label="Program" value={profile?.program ? `${profile.program.code} • ${profile.program.semester} sem • ${formatAcademicYear(profile.program.academicYear)}` : 'Not assigned'} />
           </div>
         </div>
 

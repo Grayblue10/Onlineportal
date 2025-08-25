@@ -37,12 +37,46 @@ export default function TeacherGrades() {
     maxScore: 5,
     score: 1.0,
     semester: 'first',
-    academicYear: '2024-25'
+    academicYear: (() => {
+      const year = new Date().getFullYear();
+      return `${year}-${year + 1}`;
+    })()
   });
 
   useEffect(() => {
     fetchInitialData();
   }, []);
+
+  // Normalize/format academic year to YYYY-YYYY
+  const formatAcademicYear = (val) => {
+    if (!val) {
+      const y = new Date().getFullYear();
+      return `${y}-${y + 1}`;
+    }
+    const str = String(val).trim();
+    // If already YYYY-YYYY
+    const mFull = str.match(/^(\d{4})\s*[-/]\s*(\d{4})$/);
+    if (mFull) return `${mFull[1]}-${mFull[2]}`;
+    // If YYYY-YY -> expand to YYYY-(YYYY+1)
+    const mShort = str.match(/^(\d{4})\s*[-/]\s*(\d{2})$/);
+    if (mShort) {
+      const start = parseInt(mShort[1], 10);
+      const end2 = parseInt(mShort[2], 10);
+      // Derive full end year (works for 00-99 within the same century or next)
+      let end = start + 1;
+      // If provided end2 does not match start+1 last two digits, still format to start-(start+1)
+      return `${start}-${end}`;
+    }
+    // If single YYYY
+    const mSingle = str.match(/^(\d{4})$/);
+    if (mSingle) {
+      const start = parseInt(mSingle[1], 10);
+      return `${start}-${start + 1}`;
+    }
+    // Fallback to current
+    const y = new Date().getFullYear();
+    return `${y}-${y + 1}`;
+  };
 
   useEffect(() => {
     if (classes.length > 0) {
@@ -244,6 +278,7 @@ export default function TeacherGrades() {
         maxScore: 5,
         // Ensure score is within 1.0 - 5.0 in 0.25 increments
         score: Math.max(1, Math.min(5, Math.round((gradeFormData.score || 1) * 4) / 4)),
+        academicYear: formatAcademicYear(gradeFormData.academicYear),
         // Include subject for clarity (backend embeds from class but this keeps API explicit)
         ...(subjectFromClass ? { subject: subjectFromClass } : {})
       };
@@ -368,7 +403,7 @@ export default function TeacherGrades() {
       maxScore: 5,
       score: score ?? 1.0,
       semester: grade.semester,
-      academicYear: grade.academicYear
+      academicYear: formatAcademicYear(grade.academicYear)
     });
     setIsEditing(true);
     setIsModalOpen(true);

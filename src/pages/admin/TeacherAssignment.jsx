@@ -11,11 +11,43 @@ const TeacherAssignment = () => {
   const [selectedTeacher, setSelectedTeacher] = useState('');
   const [selectedSubjects, setSelectedSubjects] = useState([]);
   const [semester, setSemester] = useState('first');
-  const [academicYear, setAcademicYear] = useState(new Date().getFullYear());
+  const [academicYear, setAcademicYear] = useState(() => {
+    const y = new Date().getFullYear();
+    return `${y}-${y + 1}`;
+  });
   const [loading, setLoading] = useState(false);
   const [assigning, setAssigning] = useState(false);
   const [deleteIfEmpty, setDeleteIfEmpty] = useState(true);
   const [unassigning, setUnassigning] = useState(false);
+
+  // Helpers: format/display YYYY-YYYY and extract start year for API
+  const formatAcademicYear = (val) => {
+    if (!val) {
+      const y = new Date().getFullYear();
+      return `${y}-${y + 1}`;
+    }
+    const str = String(val).trim();
+    const mFull = str.match(/^(\d{4})\s*[-\/]\s*(\d{4})$/);
+    if (mFull) return `${mFull[1]}-${mFull[2]}`;
+    const mShort = str.match(/^(\d{4})\s*[-\/]\s*(\d{2})$/);
+    if (mShort) {
+      const start = parseInt(mShort[1], 10);
+      return `${start}-${start + 1}`;
+    }
+    const mSingle = str.match(/^(\d{4})$/);
+    if (mSingle) {
+      const start = parseInt(mSingle[1], 10);
+      return `${start}-${start + 1}`;
+    }
+    const y = new Date().getFullYear();
+    return `${y}-${y + 1}`;
+  };
+
+  const getStartYear = (sy) => {
+    const str = formatAcademicYear(sy);
+    const m = str.match(/^(\d{4})-\d{4}$/);
+    return m ? parseInt(m[1], 10) : new Date().getFullYear();
+  };
 
   // Fetch teachers and subjects
   useEffect(() => {
@@ -26,7 +58,7 @@ const TeacherAssignment = () => {
         
         const [teachersResponse, subjectsResponse] = await Promise.all([
           api.get('/api/admin/teachers', {
-            params: { semester, academicYear }
+            params: { semester, academicYear: getStartYear(academicYear) }
           }),
           api.get('/api/admin/subjects')
         ]);
@@ -78,14 +110,14 @@ const TeacherAssignment = () => {
         teacherId: selectedTeacher,
         subjectIds: selectedSubjects,
         semester,
-        academicYear
+        academicYear: getStartYear(academicYear)
       });
 
       const response = await api.post('/api/admin/teachers/assign', {
         teacherId: selectedTeacher,
         subjectIds: selectedSubjects,
         semester,
-        academicYear
+        academicYear: getStartYear(academicYear)
       });
 
       console.log('[TeacherAssignment] Assignment successful:', response.data);
@@ -103,7 +135,7 @@ const TeacherAssignment = () => {
       
       // Refresh teachers data
       const teachersResponse = await api.get('/api/admin/teachers', {
-        params: { semester, academicYear }
+        params: { semester, academicYear: getStartYear(academicYear) }
       });
       setTeachers(teachersResponse.data.data || []);
 
@@ -140,7 +172,7 @@ const TeacherAssignment = () => {
         teacherId: selectedTeacher,
         subjectId: subject._id,
         semester,
-        academicYear,
+        academicYear: getStartYear(academicYear),
         deleteIfEmpty,
       };
 
@@ -149,7 +181,7 @@ const TeacherAssignment = () => {
 
       // Refresh teachers data to reflect updated assignments
       const teachersResponse = await api.get('/api/admin/teachers', {
-        params: { semester, academicYear },
+        params: { semester, academicYear: getStartYear(academicYear) },
       });
       setTeachers(teachersResponse.data.data || []);
     } catch (error) {
@@ -317,11 +349,13 @@ const TeacherAssignment = () => {
                   Academic Year
                 </label>
                 <input
-                  type="number"
+                  type="text"
                   value={academicYear}
-                  onChange={(e) => setAcademicYear(parseInt(e.target.value))}
+                  onChange={(e) => setAcademicYear(e.target.value)}
+                  onBlur={(e) => setAcademicYear(formatAcademicYear(e.target.value))}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent"
                   style={{'--tw-ring-color': 'var(--deep-blue)'}}
+                  placeholder="YYYY-YYYY"
                 />
               </div>
             </div>

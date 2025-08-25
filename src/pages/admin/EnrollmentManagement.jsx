@@ -15,6 +15,35 @@ const EnrollmentManagement = () => {
   const [confirm, setConfirm] = useState({ open: false, enrollment: null });
   const [deleting, setDeleting] = useState(false);
 
+  // Helpers: format/display YYYY-YYYY and extract start year for API
+  const formatAcademicYear = (val) => {
+    if (!val) {
+      const y = new Date().getFullYear();
+      return `${y}-${y + 1}`;
+    }
+    const str = String(val).trim();
+    const mFull = str.match(/^(\d{4})\s*[-\/]\s*(\d{4})$/);
+    if (mFull) return `${mFull[1]}-${mFull[2]}`;
+    const mShort = str.match(/^(\d{4})\s*[-\/]\s*(\d{2})$/);
+    if (mShort) {
+      const start = parseInt(mShort[1], 10);
+      return `${start}-${start + 1}`;
+    }
+    const mSingle = str.match(/^(\d{4})$/);
+    if (mSingle) {
+      const start = parseInt(mSingle[1], 10);
+      return `${start}-${start + 1}`;
+    }
+    const y = new Date().getFullYear();
+    return `${y}-${y + 1}`;
+  };
+
+  const getStartYear = (sy) => {
+    const str = formatAcademicYear(sy);
+    const m = str.match(/^(\d{4})-\d{4}$/);
+    return m ? parseInt(m[1], 10) : new Date().getFullYear();
+  };
+
   const doSearch = useCallback(
     debounce(async (q) => {
       if (!q || q.trim().length < 2) {
@@ -73,7 +102,7 @@ const EnrollmentManagement = () => {
         studentId: student.id || student._id || student.studentId,
         subjectId: enr.subject?._id || enr.subjectId,
         semester: enr.semester || enr.term,
-        academicYear: enr.academicYear || enr.year,
+        academicYear: getStartYear(enr.academicYear || enr.year),
       });
       toast.success('Enrollment removed');
       setConfirm({ open: false, enrollment: null });
@@ -199,7 +228,7 @@ const EnrollmentManagement = () => {
                   <div>
                     <p className="font-semibold text-gray-900">{enr.subject?.code} - {enr.subject?.name}</p>
                     <p className="text-sm text-gray-600">{(enr.semester || enr.term || '').toString().replace('first', 'First Semester').replace('second', 'Second Semester')}</p>
-                    <p className="text-xs text-gray-500">AY: {enr.academicYear || enr.year || 'N/A'}</p>
+                    <p className="text-xs text-gray-500">AY: {formatAcademicYear(enr.academicYear || enr.year) || 'N/A'}</p>
                   </div>
                   <Button
                     variant="danger"
