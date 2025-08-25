@@ -365,7 +365,7 @@ const StudentEnrollment = () => {
               <AlertCircle className="h-4 w-4 mt-0.5" />
               <div>
                 <p className="font-medium">Unit Limit Policy</p>
-                <p>Each student can enroll up to a maximum of 23 units per semester. The system will prevent enrollments exceeding this cap.</p>
+                <p>Each student can enroll up to a maximum of 30 units per semester. The system will prevent enrollments exceeding this cap.</p>
               </div>
             </div>
             <div>
@@ -469,7 +469,7 @@ const StudentEnrollment = () => {
               size="md"
               fullWidth
               onClick={handleEnroll}
-              disabled={!selectedStudent || !selectedSubject || schedule.days.length === 0 || !schedule.startTime || !schedule.endTime || enrolling || (subjects.find(s => s._id === selectedSubject)?.units || 0) > 23}
+              disabled={!selectedStudent || !selectedSubject || schedule.days.length === 0 || !schedule.startTime || !schedule.endTime || enrolling || (subjects.find(s => s._id === selectedSubject)?.units || 0) > 30}
               loading={enrolling}
             >
               {enrolling ? (

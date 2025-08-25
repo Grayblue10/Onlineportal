@@ -98,7 +98,7 @@ const EnrolledStudents = () => {
       </div>
       <div className="flex justify-between items-center">
         <div className="text-sm text-gray-600">
-          Student enrollment in your subjects (Max: 30 per subject)
+          Student enrollment in your subjects (Max: 60 per subject)
         </div>
         <div>
           <select

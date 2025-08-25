@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Users, BookOpen, Calendar, Clock, Search, 
-  Filter, Eye, Edit, Plus, Loader2, RefreshCw 
+  Filter, Eye, Edit, Plus, Loader2, RefreshCw, GraduationCap 
 } from 'lucide-react';
 import { Button, Input, Card, Badge, Modal, MobileCardList, ResponsiveTable } from '../../components/ui';
 import { toast } from 'react-hot-toast';
@@ -177,6 +177,8 @@ export default function TeacherClasses() {
     // Load enrolled students for this class
     setModalLoading(true);
     setModalStudents([]);
+    // Ensure we fetch fresh students (not cached) so year levels are up-to-date
+    teacherService.clearCache(`class_${classItem.id}_students`);
     teacherService.getClassStudents(classItem.id)
       .then((res) => {
         const data = res?.data || res || [];
@@ -413,7 +415,15 @@ export default function TeacherClasses() {
                       {modalStudents.map((st) => (
                         <div key={st._id} className="p-3 flex items-center justify-between">
                           <div className="min-w-0 mr-3">
-                            <div className="text-sm font-medium text-gray-900 truncate">{st.firstName} {st.lastName}</div>
+                            <div className="flex items-center gap-2">
+                              <div className="text-sm font-medium text-gray-900 truncate">{st.firstName} {st.lastName}</div>
+                              {typeof st.yearLevel !== 'undefined' && (
+                                <Badge className="bg-indigo-50 text-indigo-700 border border-indigo-200 flex items-center gap-1 py-0.5">
+                                  <GraduationCap className="w-3 h-3" />
+                                  Y{st.yearLevel}
+                                </Badge>
+                              )}
+                            </div>
                             <div className="text-xs text-gray-500 truncate">{st.studentId}</div>
                           </div>
                           <Button
@@ -440,6 +450,7 @@ export default function TeacherClasses() {
                         <tr>
                           <th className="text-left px-3 py-2 text-gray-600 font-medium">Student</th>
                           <th className="text-left px-3 py-2 text-gray-600 font-medium">ID</th>
+                          <th className="text-left px-3 py-2 text-gray-600 font-medium">Year</th>
                           <th className="text-right px-3 py-2 text-gray-600 font-medium">Action</th>
                         </tr>
                       </thead>
@@ -448,6 +459,16 @@ export default function TeacherClasses() {
                           <tr key={st._id} className="border-t">
                             <td className="px-3 py-2 text-gray-900">{st.firstName} {st.lastName}</td>
                             <td className="px-3 py-2 text-gray-600">{st.studentId}</td>
+                            <td className="px-3 py-2 text-gray-600">
+                              {typeof st.yearLevel !== 'undefined' ? (
+                                <Badge className="bg-indigo-50 text-indigo-700 border border-indigo-200 flex items-center gap-1">
+                                  <GraduationCap className="w-3 h-3" />
+                                  Y{st.yearLevel}
+                                </Badge>
+                              ) : (
+                                <span className="text-gray-400">—</span>
+                              )}
+                            </td>
                             <td className="px-3 py-2 text-right">
                               <Button
                                 size="xs"
