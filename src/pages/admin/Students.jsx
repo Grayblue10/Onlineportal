@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Search, Users, CheckCircle2, XCircle, Loader2, IdCard, Mail, Hash, BookOpen, User2, Trash2 } from 'lucide-react';
+import { Search, Users, CheckCircle2, XCircle, Loader2, CreditCard, Mail, Hash, BookOpen, User2, Trash2 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { Card } from '../../components/ui';
 import adminEnrollmentService from '../../services/adminEnrollmentService';
@@ -171,7 +171,7 @@ const Students = () => {
                   <p className="font-medium text-gray-900">{displayName(s)}</p>
                   <p className="text-sm text-gray-600">{s.email || s.username}</p>
                   <div className="flex items-center gap-3 mt-1 text-xs text-gray-500">
-                    <span className="inline-flex items-center gap-1"><IdCard className="h-3 w-3" />{studentNumber(s) || '—'}</span>
+                    <span className="inline-flex items-center gap-1"><CreditCard className="h-3 w-3" />{studentNumber(s) || '—'}</span>
                     {s.program && <span>{typeof s.program === 'string' ? s.program : s.program?.code}</span>}
                     {s.department && <span>{s.department}</span>}
                   </div>
