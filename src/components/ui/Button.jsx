@@ -61,6 +61,7 @@ const Button = ({
     <button
       className={buttonClasses}
       disabled={disabled || loading}
+      aria-busy={loading ? 'true' : 'false'}
       {...props}
     >
       {loading && (

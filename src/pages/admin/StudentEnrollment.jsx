@@ -285,6 +285,7 @@ const StudentEnrollment = () => {
                   placeholder="Search by name, email, or student ID..."
                   className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent"
                   style={{'--tw-ring-color': 'var(--deep-blue)'}}
+                  aria-label="Search student by name, email, or student ID"
                 />
                 {searching && (
                   <Loader2 className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 animate-spin text-gray-400" />
@@ -298,7 +299,16 @@ const StudentEnrollment = () => {
                     <div
                       key={student.id}
                       onClick={() => handleStudentSelect(student)}
-                      className="p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0"
+                      className="p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          handleStudentSelect(student);
+                        }
+                      }}
+                      aria-label={`Select ${student.name} (${student.email})`}
                     >
                       <div className="flex justify-between items-center">
                         <div>
@@ -407,6 +417,7 @@ const StudentEnrollment = () => {
                           ? 'bg-blue-600 text-white'
                           : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                       }`}
+                      aria-pressed={schedule.days.includes(day)}
                     >
                       {day === 'TH' ? 'Thu' : day === 'T' ? 'Tue' : day === 'W' ? 'Wed' : day === 'S' ? 'Sat' : day === 'M' ? 'Mon' : day === 'F' ? 'Fri' : day}
                     </button>
@@ -486,7 +497,7 @@ const StudentEnrollment = () => {
             </Button>
 
             {errorMsg && (
-              <div className="mt-3 p-3 rounded-md border border-red-200 bg-red-50 text-red-700 text-sm">
+              <div className="mt-3 p-3 rounded-md border border-red-200 bg-red-50 text-red-700 text-sm" role="alert" aria-live="assertive">
                 {errorMsg}
               </div>
             )}

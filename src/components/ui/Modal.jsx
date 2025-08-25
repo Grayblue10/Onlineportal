@@ -48,7 +48,7 @@ const Modal = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto">
+    <div className="fixed inset-0 z-50 overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="modal-title">
       {/* Overlay */}
       <div 
         className={twMerge(
@@ -71,14 +71,15 @@ const Modal = ({
         >
           {/* Header */}
           <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-            <h3 className="text-lg font-medium text-gray-900">
+            <h3 id="modal-title" className="text-lg font-medium text-gray-900">
               {title}
             </h3>
+            <div className="ml-4 h-0.5 w-10 bg-blue-200 rounded hidden" aria-hidden="true" />
             
             {!hideCloseButton && (
               <button
                 type="button"
-                className="text-gray-400 hover:text-gray-500 focus:outline-none"
+                className="text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded"
                 onClick={onClose}
                 aria-label="Close"
               >

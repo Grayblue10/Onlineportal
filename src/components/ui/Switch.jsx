@@ -20,11 +20,20 @@ const Switch = ({
         type="button"
         role="switch"
         aria-checked={checked}
+        aria-disabled={disabled}
+        aria-label={label || 'Toggle'}
         disabled={disabled}
         onClick={() => onChange(!checked)}
+        onKeyDown={(e) => {
+          if (disabled) return;
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            onChange(!checked);
+          }
+        }}
         className={twMerge(
-          'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2',
-          checked ? 'bg-indigo-600' : 'bg-gray-200',
+          'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2',
+          checked ? 'bg-blue-600' : 'bg-gray-200',
           disabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-opacity-80'
         )}
         {...props}

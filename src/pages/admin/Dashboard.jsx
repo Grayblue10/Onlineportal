@@ -140,7 +140,7 @@ const AdminDashboard = () => {
     if (window.confirm('Are you sure you want to delete this subject? This action cannot be undone.')) {
       try {
         setLoading(true);
-        await api.delete(`/admin/subjects/${id}`);
+        await api.delete(`/api/admin/subjects/${id}`);
         toast.success('Subject deleted successfully');
         await fetchSubjects();
       } catch (error) {
@@ -176,21 +176,21 @@ const AdminDashboard = () => {
       title: 'Students',
       value: stats.totalStudents || 0,
       icon: Users,
-      color: 'bg-blue-500',
+      color: 'bg-blue-600',
       onClick: () => navigate('/admin/users?role=student')
     },
     {
       title: 'Teachers',
       value: stats.totalTeachers || 0,
       icon: BookOpen,
-      color: 'bg-teacher-500',
+      color: 'bg-amber-500',
       onClick: () => navigate('/admin/teachers')
     },
     {
       title: 'Subjects',
       value: subjects.length || 0,
       icon: TrendingUp,
-      color: 'bg-green-500',
+      color: 'bg-green-600',
       onClick: undefined
     }
   ];
@@ -204,7 +204,19 @@ const AdminDashboard = () => {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {statCards.map((stat, index) => (
-          <Card key={index} className="p-6 cursor-pointer hover:shadow-lg transition-shadow" onClick={stat.onClick}>
+          <Card
+            key={index}
+            className="p-6 cursor-pointer hover:shadow-lg transition-shadow focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            onClick={stat.onClick}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if ((e.key === 'Enter' || e.key === ' ') && typeof stat.onClick === 'function') {
+                e.preventDefault();
+                stat.onClick();
+              }
+            }}
+          >
             <div className="flex items-center">
               <div className={`${stat.color} p-3 rounded-lg`}>
                 <stat.icon className="w-6 h-6 text-white" />
@@ -223,7 +235,7 @@ const AdminDashboard = () => {
         <Card className="p-6">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-lg font-medium text-gray-900">Subjects</h3>
-            <Button size="sm" onClick={openNewSubjectModal}>
+            <Button size="sm" variant="primary" onClick={openNewSubjectModal}>
               Create Subject
             </Button>
           </div>
@@ -234,6 +246,7 @@ const AdminDashboard = () => {
               onChange={(e) => setSubjectSearch(e.target.value)}
               placeholder="Search subjects by name, code, or department..."
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              aria-label="Search subjects by name, code, or department"
             />
           </div>
           <div className="space-y-3">
@@ -253,6 +266,7 @@ const AdminDashboard = () => {
                       variant="ghost"
                       size="sm"
                       onClick={() => handleEditSubject(subject)}
+                      aria-label={`Edit subject ${subject.name}`}
                     >
                       <Edit className="h-4 w-4" />
                     </Button>
@@ -261,6 +275,7 @@ const AdminDashboard = () => {
                       size="sm"
                       onClick={() => handleDeleteSubject(subject._id)}
                       className="text-red-600 hover:text-red-800 hover:bg-red-50"
+                      aria-label={`Delete subject ${subject.name}`}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
@@ -276,7 +291,7 @@ const AdminDashboard = () => {
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <span className="text-gray-600">Total Subjects</span>
-              <span className="font-semibold text-primary-600">
+              <span className="font-semibold text-blue-600">
                 {subjects.length}
               </span>
             </div>
@@ -292,7 +307,7 @@ const AdminDashboard = () => {
             </div>
             <div className="flex justify-between items-center">
               <span className="text-gray-600">Server Uptime</span>
-              <span className="text-primary-600 font-semibold">99.9%</span>
+              <span className="text-blue-600 font-semibold">99.9%</span>
             </div>
           </div>
         </Card>

@@ -24,7 +24,7 @@ const Input = forwardRef(({
   ...props
 }, ref) => {
   // Base input classes
-  const inputBaseClasses = 'block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6';
+  const inputBaseClasses = 'block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6';
   
   // Error state
   const errorClasses = error ? 'ring-red-500 text-red-900 placeholder-red-300 focus:ring-red-500' : '';
@@ -39,6 +39,10 @@ const Input = forwardRef(({
   const withIconClasses = startIcon || endIcon ? 'relative' : '';
   const startIconClasses = startIcon ? 'pl-10' : '';
   const endIconClasses = endIcon ? 'pr-10' : '';
+
+  // Accessibility ids for error/helper
+  const errorId = error ? `${id}-error` : undefined;
+  const helperId = helperText && !error ? `${id}-helper` : undefined;
 
   return (
     <div className={twMerge('mb-4', widthClass, className)}>
@@ -71,6 +75,8 @@ const Input = forwardRef(({
               'resize-vertical',
               inputClassName
             )}
+            aria-invalid={!!error}
+            aria-describedby={error ? errorId : helperId}
             {...props}
           />
         ) : (
@@ -86,6 +92,8 @@ const Input = forwardRef(({
               endIcon && 'pr-10',
               inputClassName
             )}
+            aria-invalid={!!error}
+            aria-describedby={error ? errorId : helperId}
             {...props}
           />
         )}
@@ -98,13 +106,13 @@ const Input = forwardRef(({
       </div>
       
       {error && (
-        <p className={twMerge('mt-1 text-sm text-red-600', errorClassName)}>
+        <p id={errorId} className={twMerge('mt-1 text-sm text-red-600', errorClassName)}>
           {error}
         </p>
       )}
       
       {helperText && !error && (
-        <p className={twMerge('mt-1 text-sm text-gray-500', helperTextClassName)}>
+        <p id={helperId} className={twMerge('mt-1 text-sm text-gray-500', helperTextClassName)}>
           {helperText}
         </p>
       )}

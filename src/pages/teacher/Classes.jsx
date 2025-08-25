@@ -3,7 +3,7 @@ import {
   Users, BookOpen, Calendar, Clock, Search, 
   Filter, Eye, Edit, Plus, Loader2, RefreshCw, GraduationCap 
 } from 'lucide-react';
-import { Button, Input, Card, Badge, Modal, MobileCardList, ResponsiveTable } from '../../components/ui';
+import { Button, Input, Card, Badge, Modal, MobileCardList, ResponsiveTable, Select } from '../../components/ui';
 import { toast } from 'react-hot-toast';
 import { useAuth } from '../../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
@@ -225,6 +225,10 @@ export default function TeacherClasses() {
     return matchesSearch && matchesSemester;
   });
 
+  const hasActiveFilters = Boolean(filters.search || filters.semester);
+  const totalCount = classes.length;
+  const shownCount = filteredClasses.length;
+
   return (
     <div className="container mx-auto px-4 py-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
@@ -263,32 +267,73 @@ export default function TeacherClasses() {
               className="pl-10"
               value={filters.search}
               onChange={handleFilterChange}
+              aria-label="Search classes"
             />
           </div>
           
-          <select
-            name="semester"
+          <Select
+            label="Semester"
+            options={[
+              { value: '', label: 'All Semesters' },
+              { value: 'First Semester', label: 'First Semester' },
+              { value: 'Second Semester', label: 'Second Semester' },
+            ]}
             value={filters.semester}
-            onChange={handleFilterChange}
-            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teacher-500"
-          >
-            <option value="">All Semesters</option>
-            <option value="First Semester">First Semester</option>
-            <option value="Second Semester">Second Semester</option>
-          </select>
+            onChange={(val) => setFilters(prev => ({ ...prev, semester: val }))}
+            aria-label="Filter by semester"
+          />
+
+          <div className="flex items-end">
+            {hasActiveFilters && (
+              <Button
+                variant="secondary"
+                size="md"
+                onClick={() => setFilters({ search: '', semester: '' })}
+                aria-label="Clear filters"
+              >
+                Clear Filters
+              </Button>
+            )}
+          </div>
         </div>
       </Card>
+
+      {/* Result count helper */}
+      <div className="flex justify-between items-center text-sm text-gray-600">
+        <span aria-live="polite">Showing {shownCount} of {totalCount} classes</span>
+        {hasActiveFilters && (
+          <button
+            type="button"
+            className="text-blue-600 hover:text-blue-700 underline"
+            onClick={() => setFilters({ search: '', semester: '' })}
+            aria-label="Clear filters"
+          >
+            Clear filters
+          </button>
+        )}
+      </div>
 
       {/* Classes Grid */}
       {loading ? (
         <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teacher-600"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
         </div>
       ) : filteredClasses.length === 0 ? (
         <Card className="p-12 text-center">
           <BookOpen className="w-16 h-16 text-gray-400 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-gray-900 mb-2">No Classes Found</h3>
           <p className="text-gray-600 mb-4">No classes match your current filters. Try clearing the search or semester filters.</p>
+          {hasActiveFilters && (
+            <div className="mb-4">
+              <Button
+                variant="secondary"
+                onClick={() => setFilters({ search: '', semester: '' })}
+                aria-label="Clear filters to show all classes"
+              >
+                Clear Filters
+              </Button>
+            </div>
+          )}
           <Button
             variant="primary"
             size="md"
@@ -304,8 +349,8 @@ export default function TeacherClasses() {
             <Card key={classItem.id} className="p-6 hover:shadow-lg transition-shadow">
               <div className="flex justify-between items-start mb-4">
                 <div className="flex items-center space-x-3">
-                  <div className="w-12 h-12 bg-teacher-100 rounded-lg flex items-center justify-center">
-                    <BookOpen className="w-6 h-6 text-teacher-600" />
+                  <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center">
+                    <BookOpen className="w-6 h-6 text-blue-600" />
                   </div>
                   <div>
                     <h3 className="font-semibold text-gray-900">{classItem.name}</h3>
@@ -342,6 +387,7 @@ export default function TeacherClasses() {
                   variant="outline"
                   onClick={() => handleViewClass(classItem)}
                   className="flex-1"
+                  aria-label={`View details for ${classItem.name}`}
                 >
                   <Eye className="w-4 h-4 mr-1" />
                   View
@@ -351,6 +397,7 @@ export default function TeacherClasses() {
                   variant="success"
                   onClick={() => handleGradeClass(classItem)}
                   className="flex-1"
+                  aria-label={`Open grading for ${classItem.name}`}
                 >
                   <Edit className="w-4 h-4 mr-1" />
                   Grade
@@ -371,8 +418,8 @@ export default function TeacherClasses() {
         {selectedClass && (
           <div className="space-y-6">
             <div className="flex items-center space-x-4">
-              <div className="w-16 h-16 bg-teacher-100 rounded-lg flex items-center justify-center">
-                <BookOpen className="w-8 h-8 text-teacher-600" />
+              <div className="w-16 h-16 bg-blue-50 rounded-lg flex items-center justify-center">
+                <BookOpen className="w-8 h-8 text-blue-600" />
               </div>
               <div>
                 <h2 className="text-xl font-semibold text-gray-900">{selectedClass.name}</h2>
@@ -418,7 +465,7 @@ export default function TeacherClasses() {
                             <div className="flex items-center gap-2">
                               <div className="text-sm font-medium text-gray-900 truncate">{st.firstName} {st.lastName}</div>
                               {typeof st.yearLevel !== 'undefined' && (
-                                <Badge className="bg-indigo-50 text-indigo-700 border border-indigo-200 flex items-center gap-1 py-0.5">
+                                <Badge className="bg-blue-50 text-blue-700 border border-blue-200 flex items-center gap-1 py-0.5">
                                   <GraduationCap className="w-3 h-3" />
                                   Y{st.yearLevel}
                                 </Badge>
@@ -434,6 +481,7 @@ export default function TeacherClasses() {
                               const subj = selectedClass.subjectId ? `&subject=${selectedClass.subjectId}` : '';
                               navigate(`/teacher/grades?class=${selectedClass.id}${subj}&student=${st._id}`);
                             }}
+                            aria-label={`Grade ${st.firstName} ${st.lastName}`}
                           >
                             <Edit className="w-3 h-3 mr-1" />
                             Grade
@@ -461,7 +509,7 @@ export default function TeacherClasses() {
                             <td className="px-3 py-2 text-gray-600">{st.studentId}</td>
                             <td className="px-3 py-2 text-gray-600">
                               {typeof st.yearLevel !== 'undefined' ? (
-                                <Badge className="bg-indigo-50 text-indigo-700 border border-indigo-200 flex items-center gap-1">
+                                <Badge className="bg-blue-50 text-blue-700 border border-blue-200 flex items-center gap-1">
                                   <GraduationCap className="w-3 h-3" />
                                   Y{st.yearLevel}
                                 </Badge>
@@ -478,6 +526,7 @@ export default function TeacherClasses() {
                                   const subj = selectedClass.subjectId ? `&subject=${selectedClass.subjectId}` : '';
                                   navigate(`/teacher/grades?class=${selectedClass.id}${subj}&student=${st._id}`);
                                 }}
+                                aria-label={`Grade ${st.firstName} ${st.lastName}`}
                               >
                                 <Edit className="w-3 h-3 mr-1" />
                                 Grade

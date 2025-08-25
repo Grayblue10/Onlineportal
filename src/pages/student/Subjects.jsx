@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BookOpen, Users, Calendar, Clock, Search, Filter, Eye, Award, User, RefreshCw, AlertCircle } from 'lucide-react';
-import { Button, Input, Card, Badge, Modal } from '../../components/ui';
+import { Button, Input, Card, Badge, Modal, Select } from '../../components/ui';
 import { toast } from 'react-hot-toast';
 import { useAuth } from '../../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
@@ -253,10 +253,9 @@ export default function StudentSubjects() {
   };
 
   const getProgressColor = (percentage) => {
-    if (percentage >= 90) return 'bg-green-500';
-    if (percentage >= 80) return 'bg-blue-500';
+    if (percentage >= 90) return 'bg-green-600';
+    if (percentage >= 80) return 'bg-blue-600';
     if (percentage >= 70) return 'bg-yellow-500';
-    if (percentage >= 60) return 'bg-orange-500';
     return 'bg-red-500';
   };
 
@@ -281,6 +280,10 @@ export default function StudentSubjects() {
     activeFilters: Object.entries(filters).filter(([key, value]) => value).length
   });
 
+  const hasActiveFilters = Boolean(filters.search || filters.semester);
+  const totalCount = subjects.length;
+  const shownCount = filteredSubjects.length;
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -288,31 +291,45 @@ export default function StudentSubjects() {
           <h1 className="text-3xl font-bold text-gray-900">My Subjects</h1>
           <p className="text-gray-600 mt-1">View your enrolled subjects and track your progress</p>
         </div>
-        <Button onClick={() => navigate('/student/grades')}>
+        <Button onClick={() => navigate('/student/grades')} aria-label="View all grades">
           <Award className="w-4 h-4 mr-2" />
           View All Grades
         </Button>
       </div>
-
       {/* Filters */}
       <Card className="p-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Search */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Semester</label>
-            <select 
-              className="w-full p-2 border border-gray-300 rounded-md"
-              value={filters.semester}
-              onChange={(e) => setFilters({...filters, semester: e.target.value})}
-              disabled={loading}
-            >
-              <option value="">All Semesters</option>
-              {semesters.map((semester) => (
-                <option key={semester} value={semester}>
-                  {semester.charAt(0).toUpperCase() + semester.slice(1)} Semester
-                </option>
-              ))}
-            </select>
+            <Input
+              id="subject-search"
+              label="Search"
+              placeholder="Search by name or code"
+              value={filters.search}
+              onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+              startIcon={<Search className="h-5 w-5 text-gray-400" aria-hidden="true" />}
+              aria-label="Search subjects by name or code"
+            />
           </div>
+          {/* Semester */}
+          <div>
+            <Select
+              label="Semester"
+              placeholder="All Semesters"
+              value={filters.semester}
+              onChange={(val) => setFilters({ ...filters, semester: val })}
+              disabled={loading}
+              aria-label="Filter by semester"
+              options={[
+                { value: '', label: 'All Semesters' },
+                ...semesters.map((s) => ({
+                  value: s,
+                  label: `${s.charAt(0).toUpperCase() + s.slice(1)} Semester`
+                }))
+              ]}
+            />
+          </div>
+          {/* Actions */}
           <div className="flex items-end gap-2">
             <Button 
               variant="outline"
@@ -320,28 +337,56 @@ export default function StudentSubjects() {
               onClick={handleRefresh}
               disabled={loading}
               className="flex items-center gap-2"
+              aria-label="Refresh subjects"
             >
               <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
               Refresh
             </Button>
+            {hasActiveFilters && (
+              <Button
+                variant="secondary"
+                size="md"
+                onClick={() => setFilters({ ...filters, search: '', semester: '' })}
+                aria-label="Clear filters"
+              >
+                Clear Filters
+              </Button>
+            )}
           </div>
         </div>
       </Card>
 
+      {/* Result count helper */}
+      <div className="flex justify-between items-center text-sm text-gray-600">
+        <span aria-live="polite">
+          Showing {shownCount} of {totalCount} subjects
+        </span>
+        {hasActiveFilters && (
+          <button
+            type="button"
+            className="text-blue-600 hover:text-blue-700 underline"
+            onClick={() => setFilters({ ...filters, search: '', semester: '' })}
+            aria-label="Clear filters"
+          >
+            Clear filters
+          </button>
+        )}
+      </div>
+
       {/* Subjects Grid */}
       {loading ? (
         <div className="flex flex-col items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-student-500 mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600 mb-4"></div>
           <p className="text-gray-600">Loading your subjects...</p>
         </div>
       ) : error ? (
-        <div className="text-center py-12">
+        <div className="text-center py-12" role="alert" aria-live="assertive">
           <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <AlertCircle className="w-6 h-6 text-red-500" />
           </div>
           <h3 className="text-lg font-medium text-gray-900 mb-2">Error loading subjects</h3>
           <p className="text-gray-600 mb-4">{error}</p>
-          <Button onClick={fetchSubjects} variant="outline">
+          <Button onClick={fetchSubjects} variant="outline" aria-label="Try loading subjects again">
             <RefreshCw className="w-4 h-4 mr-2" />
             Try Again
           </Button>
@@ -351,6 +396,17 @@ export default function StudentSubjects() {
           <BookOpen className="w-16 h-16 text-gray-400 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-gray-900 mb-2">No Subjects Found</h3>
           <p className="text-gray-600">You don't have any subjects enrolled yet or no subjects match your filters.</p>
+          {hasActiveFilters && (
+            <div className="mt-4">
+              <Button
+                variant="secondary"
+                onClick={() => setFilters({ ...filters, search: '', semester: '' })}
+                aria-label="Clear filters to show all subjects"
+              >
+                Clear Filters
+              </Button>
+            </div>
+          )}
         </Card>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -361,12 +417,12 @@ export default function StudentSubjects() {
                   <div className={`flex-shrink-0 h-12 w-12 rounded-full flex items-center justify-center ${
                     subject.currentGrade 
                       ? getGradeColor(subject.currentGrade).replace('bg-', 'bg-opacity-20 bg-')
-                      : 'bg-student-100'
+                      : 'bg-blue-50'
                   }`}>
                     <BookOpen className={`h-6 w-6 ${
                       subject.currentGrade 
                         ? getGradeColor(subject.currentGrade)
-                        : 'text-student-600'
+                        : 'text-blue-600'
                     }`} />
                   </div>
                   <div>
@@ -401,7 +457,7 @@ export default function StudentSubjects() {
                     <span className="text-sm font-medium text-gray-500 mr-2">Progress:</span>
                     <div className="w-24 bg-gray-200 rounded-full h-2">
                       <div 
-                        className="bg-student-600 h-2 rounded-full" 
+                        className={`${getProgressColor((subject.completedAssignments / subject.totalAssignments) * 100)} h-2 rounded-full`} 
                         style={{ 
                           width: `${(subject.completedAssignments / subject.totalAssignments) * 100}%` 
                         }}
@@ -416,10 +472,10 @@ export default function StudentSubjects() {
 
               {/* Next Assignment */}
               {subject.nextAssignment && (
-                <div className="mb-4 p-3 bg-student-50 rounded-lg">
-                  <p className="text-sm font-medium text-student-900">Next Assignment:</p>
-                  <p className="text-sm text-student-700">{subject.nextAssignment}</p>
-                  <p className="text-xs text-student-600 mt-1">
+                <div className="mb-4 p-3 bg-blue-50 rounded-lg">
+                  <p className="text-sm font-medium text-blue-900">Next Assignment:</p>
+                  <p className="text-sm text-blue-700">{subject.nextAssignment}</p>
+                  <p className="text-xs text-blue-600 mt-1">
                     Due: {new Date(subject.nextAssignmentDue).toLocaleDateString()}
                   </p>
                 </div>
@@ -431,14 +487,17 @@ export default function StudentSubjects() {
                   size="sm"
                   onClick={() => handleViewSubject(subject)}
                   className="flex-1"
+                  aria-label={`View details for ${subject.name}`}
                 >
                   <Eye className="w-4 h-4 mr-1" />
                   View
                 </Button>
                 <Button
                   size="sm"
+                  variant="primary"
                   onClick={() => handleViewGrades(subject)}
-                  className="flex-1 bg-student-600 hover:bg-student-700"
+                  className="flex-1"
+                  aria-label={`View grades for ${subject.name}`}
                 >
                   <Award className="w-4 h-4 mr-1" />
                   Grades
@@ -529,7 +588,7 @@ export default function StudentSubjects() {
                 Close
               </Button>
               <Button 
-                className="bg-student-600 hover:bg-student-700"
+                variant="primary"
                 onClick={() => {
                   setIsModalOpen(false);
                   navigate(`/student/subjects/${selectedSubject._id || selectedSubject.id}`);

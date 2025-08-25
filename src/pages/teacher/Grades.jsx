@@ -471,55 +471,77 @@ export default function TeacherGrades() {
               onChange={handleFilterChange}
             />
           </div>
-          <select
-            name="subject"
+          <Select
+            label="Subject"
+            options={[
+              { value: '', label: 'All Subjects' },
+              ...(
+                (subjects && subjects.length > 0
+                  ? subjects
+                  : [...new Map(classes.filter(c => c.subject).map(c => [c.subject.code || c.subject.name, c.subject])).values()]
+                ).map(subj => ({
+                  value: subj.code || subj._id || subj.name,
+                  label: `${subj.name}${subj.code ? ` (${subj.code})` : ''}`
+                }))
+              )
+            ]}
             value={filters.subject}
-            onChange={handleFilterChange}
-            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teacher-500"
-          >
-            <option value="">All Subjects</option>
-            {(subjects && subjects.length > 0
-              ? subjects
-              : [...new Map(classes.filter(c => c.subject).map(c => [c.subject.code || c.subject.name, c.subject])).values()]
-            ).map(subj => (
-              <option key={subj.code || subj._id || subj.name} value={subj.code || subj._id || subj.name}>
-                {subj.name}{subj.code ? ` (${subj.code})` : ''}
-              </option>
-            ))}
-          </select>
+            onChange={(val) => setFilters(prev => ({ ...prev, subject: val }))}
+            aria-label="Filter by subject"
+          />
           
-          <select
-            name="class"
+          <Select
+            label="Class"
+            options={[
+              { value: '', label: 'All Classes' },
+              ...classes.map(cls => ({ value: cls._id, label: cls.name }))
+            ]}
             value={filters.class}
-            onChange={handleFilterChange}
-            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teacher-500"
-          >
-            <option value="">All Classes</option>
-            {classes.map(cls => (
-                <option key={cls._id} value={cls._id}>{cls.name}</option>
-              ))}
-          </select>
+            onChange={(val) => setFilters(prev => ({ ...prev, class: val }))}
+            aria-label="Filter by class"
+          />
           
-          <select
-            name="semester"
+          <Select
+            label="Semester"
+            options={[
+              { value: '', label: 'All Semesters' },
+              { value: 'first', label: 'First Semester' },
+              { value: 'second', label: 'Second Semester' },
+            ]}
             value={filters.semester}
-            onChange={handleFilterChange}
-            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teacher-500"
-          >
-            <option value="">All Semesters</option>
-            <option value="first">First Semester</option>
-            <option value="second">Second Semester</option>
-          </select>
+            onChange={(val) => setFilters(prev => ({ ...prev, semester: val }))}
+            aria-label="Filter by semester"
+          />
           
-          <Button 
-            variant="secondary" 
-            size="sm"
-            onClick={() => setFilters({ search: '', subject: '', class: '', semester: '' })}
-          >
-            Clear Filters
-          </Button>
+          <div className="flex items-end">
+            {(Boolean(filters.search || filters.subject || filters.class || filters.semester)) && (
+              <Button 
+                variant="secondary" 
+                size="sm"
+                onClick={() => setFilters({ search: '', subject: '', class: '', semester: '' })}
+                aria-label="Clear filters"
+              >
+                Clear Filters
+              </Button>
+            )}
+          </div>
         </div>
       </Card>
+
+      {/* Result count helper */}
+      <div className="flex justify-between items-center text-sm text-gray-600">
+        <span aria-live="polite">Showing {grades.length} grade{grades.length === 1 ? '' : 's'}</span>
+        {Boolean(filters.search || filters.subject || filters.class || filters.semester) && (
+          <button
+            type="button"
+            className="text-blue-600 hover:text-blue-700 underline"
+            onClick={() => setFilters({ search: '', subject: '', class: '', semester: '' })}
+            aria-label="Clear filters"
+          >
+            Clear filters
+          </button>
+        )}
+      </div>
 
       {/* Grades Table */}
       {/* Enrolled students for selected class */}
@@ -703,89 +725,6 @@ export default function TeacherGrades() {
         onClose={() => !loading && setIsModalOpen(false)}
         title={`${isEditing ? 'Edit' : 'Add New'} Final Grade`}
         size="lg"
-      >
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Student</label>
-              <select
-                name="studentId"
-                value={gradeFormData.studentId}
-                onChange={handleInputChange}
-                required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teacher-500"
-                disabled={loading || studentsLoading}
-              >
-                <option value="">Select Student</option>
-                {filteredStudents.map(student => (
-                  <option key={student._id} value={student._id}>
-                    {student.firstName} {student.lastName} ({student.studentId})
-                  </option>
-                ))}
-              </select>
-              {!!(gradeFormData.classId || filters.class) && (
-                <p className="mt-1 text-xs text-gray-500">{studentsLoading ? 'Loading students for selected class...' : `Showing ${filteredStudents.length} enrolled student(s) in this class`}</p>
-              )}
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Class</label>
-              <select
-                name="classId"
-                value={gradeFormData.classId}
-                onChange={handleInputChange}
-                required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teacher-500"
-                disabled={loading}
-              >
-                <option value="">Select Class</option>
-                {classes.map(cls => (
-                    <option key={cls._id} value={cls._id}>{cls.name}</option>
-                  ))}
-              </select>
-            </div>
-            
-            {/* Subject dropdown (filters available classes) */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Subject</label>
-              <select
-                name="subjectCode"
-                value={gradeFormData.subjectCode}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teacher-500"
-                disabled={loading}
-              >
-                <option value="">Select Subject</option>
-                {(subjects && subjects.length > 0
-                  ? subjects
-                  : [...new Map(classes.filter(c => c.subject).map(c => [c.subject.code || c.subject.name, c.subject])).values()]
-                ).map(subj => (
-                  <option key={subj.code || subj._id || subj.name} value={subj.code || subj._id || subj.name}>
-                    {subj.name}{subj.code ? ` (${subj.code})` : ''}
-                  </option>
-                ))}
-              </select>
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Semester</label>
-              <select
-                name="semester"
-                value={gradeFormData.semester}
-                onChange={handleInputChange}
-                required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teacher-500"
-                disabled={loading}
-              >
-                <option value="first">First Semester</option>
-                <option value="second">Second Semester</option>
-              </select>
-            </div>
-            
-            <Input
-              label="Final Grade (1.00 – 5.00)"
-              name="score"
-              type="number"
               step="0.25"
               value={gradeFormData.score}
               onChange={handleInputChange}

@@ -1,15 +1,16 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { toast } from 'react-hot-toast';
-import { Users, Book, Mail, AlertTriangle, CheckCircle, GraduationCap } from 'lucide-react';
+import { Users, Book, Mail, AlertTriangle, CheckCircle, GraduationCap, Search } from 'lucide-react';
 import teacherService from '../../services/teacherService';
 import Card from '../../components/ui/Card';
 import Spinner from '../../components/ui/Spinner';
 import Badge from '../../components/ui/Badge';
+import { Input, Select } from '../../components/ui';
 
 const EnrolledStudents = () => {
   const [enrollmentData, setEnrollmentData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [semesterFilter, setSemesterFilter] = useState(''); // '', 'first', 'second'
+  const [filters, setFilters] = useState({ search: '', semester: '' }); // semester uses labels: '', 'First Semester', 'Second Semester'
 
   const fetchEnrolledStudents = useCallback(async () => {
     try {
@@ -82,15 +83,27 @@ const EnrolledStudents = () => {
   }));
 
   const semesterMatches = (semLabel) => {
-    if (!semesterFilter) return true;
-    if (semesterFilter === 'first') return semLabel === 'First Semester';
-    if (semesterFilter === 'second') return semLabel === 'Second Semester';
-    return true;
+    if (!filters.semester) return true;
+    return semLabel === filters.semester;
   };
 
-  const filteredData = dataWithSemester.filter((c) => semesterMatches(c._semester));
+  const filteredBySemester = dataWithSemester.filter((c) => semesterMatches(c._semester));
+  const q = filters.search.trim().toLowerCase();
+  const filteredData = filteredBySemester.filter((c) => {
+    if (!q) return true;
+    const subjectName = (c.subject?.name || '').toLowerCase();
+    const subjectCode = (c.subject?.code || '').toLowerCase();
+    const anyStudent = Array.isArray(c.students)
+      ? c.students.some(s => `${s.name || ''}`.toLowerCase().includes(q))
+      : false;
+    return subjectName.includes(q) || subjectCode.includes(q) || anyStudent;
+  });
   const firstSemData = filteredData.filter((c) => c._semester === 'First Semester');
   const secondSemData = filteredData.filter((c) => c._semester === 'Second Semester');
+
+  const hasActiveFilters = Boolean(filters.search || filters.semester);
+  const totalCount = dataWithSemester.length;
+  const shownCount = filteredData.length;
 
   return (
     <div className="space-y-6">
@@ -100,21 +113,62 @@ const EnrolledStudents = () => {
           <p className="text-sm text-gray-500 mt-1">View and manage all students enrolled in your classes</p>
         </div>
       </div>
-      <div className="flex justify-between items-center">
-        <div className="text-sm text-gray-600">
-          Student enrollment in your subjects (Max: 60 per subject)
+
+      {/* Filters */}
+      <Card>
+        <div className="p-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+            <Input
+              id="enrolled-students-search"
+              type="text"
+              name="search"
+              placeholder="Search subject or student..."
+              className="pl-10"
+              value={filters.search}
+              onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
+              aria-label="Search enrolled students"
+            />
+          </div>
+          <Select
+            label="Semester"
+            options={[
+              { value: '', label: 'All Semesters' },
+              { value: 'First Semester', label: 'First Semester' },
+              { value: 'Second Semester', label: 'Second Semester' },
+            ]}
+            value={filters.semester}
+            onChange={(val) => setFilters(prev => ({ ...prev, semester: val }))}
+            aria-label="Filter by semester"
+          />
+          <div className="flex items-end">
+            {hasActiveFilters && (
+              <button
+                type="button"
+                className="text-blue-600 hover:text-blue-700 underline text-sm"
+                onClick={() => setFilters({ search: '', semester: '' })}
+                aria-label="Clear filters"
+              >
+                Clear Filters
+              </button>
+            )}
+          </div>
         </div>
-        <div>
-          <select
-            value={semesterFilter}
-            onChange={(e) => setSemesterFilter(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teacher-500 text-sm"
+      </Card>
+
+      {/* Result count helper */}
+      <div className="flex justify-between items-center text-sm text-gray-600">
+        <span aria-live="polite">Showing {shownCount} of {totalCount} classes</span>
+        {hasActiveFilters && (
+          <button
+            type="button"
+            className="text-blue-600 hover:text-blue-700 underline"
+            onClick={() => setFilters({ search: '', semester: '' })}
+            aria-label="Clear filters"
           >
-            <option value="">All Semesters</option>
-            <option value="first">First Semester</option>
-            <option value="second">Second Semester</option>
-          </select>
-        </div>
+            Clear filters
+          </button>
+        )}
       </div>
 
       {filteredData.length === 0 ? (
@@ -125,12 +179,24 @@ const EnrolledStudents = () => {
             <p className="text-gray-600">
               You don't have any subjects assigned yet. Please assign subjects first to see enrolled students.
             </p>
+            {hasActiveFilters && (
+              <div className="mt-4">
+                <button
+                  type="button"
+                  className="text-blue-600 hover:text-blue-700 underline"
+                  onClick={() => setFilters({ search: '', semester: '' })}
+                  aria-label="Clear filters to show all classes"
+                >
+                  Clear Filters
+                </button>
+              </div>
+            )}
           </div>
         </Card>
       ) : (
         <div className="space-y-10">
           {/* If no filter, show grouped sections with headers; otherwise show a single list */}
-          {semesterFilter ? (
+          {filters.semester ? (
             <div className="grid grid-cols-1 gap-6">
               {filteredData.map((classData) => (
                 <Card key={classData._id}>
@@ -153,6 +219,7 @@ const EnrolledStudents = () => {
                             {classData.currentStudents}/{classData.maxStudents}
                           </span>
                         </div>
+                        <Badge variant="primary" className="text-xs">Max: {classData.maxStudents}</Badge>
                         <Badge variant={classData.availableSlots > 0 ? 'success' : 'warning'} className="text-xs">
                           {classData.availableSlots} slots available
                         </Badge>
@@ -200,7 +267,7 @@ const EnrolledStudents = () => {
                                 <div className="flex items-center gap-2 text-sm text-gray-500">
                                   <span className="inline-flex items-center"><Mail className="h-3 w-3 mr-1" />{student.email}</span>
                                   {typeof student.yearLevel !== 'undefined' && (
-                                    <span className="inline-flex items-center px-1.5 py-0.5 text-[11px] rounded-md border border-yellow-300 bg-yellow-50 text-yellow-700">
+                                    <span className="inline-flex items-center px-1.5 py-0.5 text-[11px] rounded-md border border-blue-300 bg-blue-50 text-blue-700">
                                       <GraduationCap className="w-3 h-3 mr-1" /> Y{student.yearLevel}
                                     </span>
                                   )}
@@ -241,6 +308,7 @@ const EnrolledStudents = () => {
                                 {getCapacityIcon(classData.currentStudents, classData.maxStudents)}
                                 <span className="ml-1">{classData.currentStudents}/{classData.maxStudents}</span>
                               </div>
+                              <Badge variant="primary" className="text-xs">Max: {classData.maxStudents}</Badge>
                               <Badge variant={classData.availableSlots > 0 ? 'success' : 'warning'} className="text-xs">{classData.availableSlots} slots available</Badge>
                             </div>
                           </div>
@@ -265,7 +333,7 @@ const EnrolledStudents = () => {
                                       <p className="font-medium text-gray-900">{student.name}</p>
                                       <div className="flex items-center text-sm text-gray-500"><Mail className="h-3 w-3 mr-1" />{student.email}</div>
                                       {typeof student.yearLevel !== 'undefined' && (
-                                        <span className="inline-flex items-center px-1.5 py-0.5 text-[11px] rounded-md border border-yellow-300 bg-yellow-50 text-yellow-700">
+                                        <span className="inline-flex items-center px-1.5 py-0.5 text-[11px] rounded-md border border-blue-300 bg-blue-50 text-blue-700">
                                           <GraduationCap className="w-3 h-3 mr-1" /> Y{student.yearLevel}
                                         </span>
                                       )}
@@ -316,6 +384,7 @@ const EnrolledStudents = () => {
                                 {getCapacityIcon(classData.currentStudents, classData.maxStudents)}
                                 <span className="ml-1">{classData.currentStudents}/{classData.maxStudents}</span>
                               </div>
+                              <Badge variant="primary" className="text-xs">Max: {classData.maxStudents}</Badge>
                               <Badge variant={classData.availableSlots > 0 ? 'success' : 'warning'} className="text-xs">{classData.availableSlots} slots available</Badge>
                             </div>
                           </div>
@@ -390,7 +459,7 @@ const EnrolledStudents = () => {
                 <div className="text-sm text-gray-600">Available Slots</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-purple-600">
+                <div className="text-2xl font-bold text-blue-600">
                   {Math.round(
                     (filteredData.reduce((sum, cls) => sum + cls.currentStudents, 0) /
                      filteredData.reduce((sum, cls) => sum + cls.maxStudents, 0)) * 100

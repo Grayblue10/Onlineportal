@@ -20,7 +20,7 @@ const Spinner = ({
   };
 
   const colorClasses = {
-    primary: 'border-t-primary-500 border-r-primary-300 border-b-primary-300 border-l-primary-300',
+    primary: 'border-t-blue-600 border-r-blue-300 border-b-blue-300 border-l-blue-300',
     white: 'border-t-white border-r-gray-200 border-b-gray-200 border-l-gray-200',
     gray: 'border-t-gray-500 border-r-gray-300 border-b-gray-300 border-l-gray-300',
     red: 'border-t-red-500 border-r-red-300 border-b-red-300 border-l-red-300',

@@ -19,7 +19,7 @@ const Card = ({
   ...props
 }) => {
   // Base card classes
-  const cardClasses = 'bg-white overflow-hidden shadow rounded-lg divide-y divide-gray-200';
+  const cardClasses = 'bg-white overflow-hidden shadow-sm rounded-xl border border-gray-200 divide-y divide-gray-200';
   
   // Hover effect
   const hoverClasses = hoverEffect ? 'transition-shadow duration-200 hover:shadow-md' : '';
@@ -51,6 +51,9 @@ const Card = ({
                 <p className="mt-1 max-w-2xl text-sm text-gray-500">
                   {subtitle}
                 </p>
+              )}
+              {(title || subtitle) && (
+                <div className="mt-3 h-0.5 w-12 bg-blue-200 rounded" />
               )}
             </>
           )}

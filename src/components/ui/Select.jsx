@@ -61,7 +61,7 @@ const Select = ({
         <button
           type="button"
           className={twMerge(
-            'relative w-full bg-white border border-gray-300 rounded-md shadow-sm pl-3 pr-10 py-2 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm',
+            'relative w-full bg-white border border-gray-300 rounded-md shadow-sm pl-3 pr-10 py-2 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm',
             disabled ? 'bg-gray-100 cursor-not-allowed opacity-70' : 'hover:bg-gray-50',
             error ? 'border-red-300 text-red-900 placeholder-red-300' : ''
           )}
@@ -91,7 +91,7 @@ const Select = ({
                 <li
                   key={option.value}
                   className={twMerge(
-                    'text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-indigo-50',
+                    'text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-blue-50',
                     option.disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
                   )}
                   onClick={() => !option.disabled && handleSelect(option)}
@@ -111,7 +111,7 @@ const Select = ({
                       {option.label}
                     </span>
                     {value === option.value && (
-                      <span className="absolute inset-y-0 right-0 flex items-center pr-4 text-indigo-600">
+                      <span className="absolute inset-y-0 right-0 flex items-center pr-4 text-blue-600">
                         <Check className="h-5 w-5" aria-hidden="true" />
                       </span>
                     )}
