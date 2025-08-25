@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import Navbar from '../components/Navbar';
-import { BarChart3, BookOpen, Users, ClipboardList, User, Settings, UserCheck } from 'lucide-react';
+import { BarChart3, Users, UserCheck } from 'lucide-react';
 
 const TeacherLayout = () => {
   const location = useLocation();
@@ -10,7 +10,6 @@ const TeacherLayout = () => {
   
   const sidebarItems = [
     { name: 'Dashboard', href: '/teacher', icon: BarChart3 },
-    { name: 'Assign Subjects', href: '/teacher/subject-assignment', icon: Settings },
     { name: 'Enrolled Students', href: '/teacher/enrolled-students', icon: UserCheck },
     { name: 'My Classes', href: '/teacher/classes', icon: Users }
   ];

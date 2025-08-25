@@ -24,7 +24,6 @@ import TeacherAssignment from './pages/admin/TeacherAssignment';
 import ProgramEnrollment from './pages/admin/ProgramEnrollment';
 import EnrollmentManagement from './pages/admin/EnrollmentManagement';
 import TeacherDashboard from './pages/teacher/Dashboard';
-import SubjectAssignment from './pages/teacher/SubjectAssignment';
 import EnrolledStudents from './pages/teacher/EnrolledStudents';
 import StudentGrades from './pages/student/Grades';
 import StudentSubjects from './pages/student/Subjects';
@@ -133,11 +132,6 @@ function AppRoutes() {
         <Route index element={
           <ErrorBoundary>
             <TeacherDashboard />
-          </ErrorBoundary>
-        } />
-        <Route path="subject-assignment" element={
-          <ErrorBoundary>
-            <SubjectAssignment />
           </ErrorBoundary>
         } />
         <Route path="enrolled-students" element={
