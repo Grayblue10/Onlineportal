@@ -170,7 +170,7 @@ export default function StudentSubjects() {
           code: subject.code || 'N/A',
           description: subject.description || 'No description available',
           units: subject.units || 3,
-          semester: subject.semester || 'first',
+          semester: (subject.semester || 'first').toString().toLowerCase(),
           department: subject.department || 'General',
           teacher: subject.teacher || { name: 'TBA', email: '' },
           teacherName: subject.teacherName || subject.teacher?.name || 'TBA',

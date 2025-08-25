@@ -23,18 +23,27 @@ const Select = ({
   const selectRef = useRef(null);
   const buttonRef = useRef(null);
   const [menuStyle, setMenuStyle] = useState({ top: 0, left: 0, width: 0 });
+  const menuRef = useRef(null);
 
-  // Close dropdown when clicking outside
+  // Close dropdown when clicking outside (including portal), and on Escape
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (selectRef.current && !selectRef.current.contains(event.target)) {
+    const handleGlobalClick = (event) => {
+      const inTrigger = selectRef.current && selectRef.current.contains(event.target);
+      const inMenu = menuRef.current && menuRef.current.contains(event.target);
+      if (!inTrigger && !inMenu) {
         setIsOpen(false);
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') setIsOpen(false);
+    };
+
+    document.addEventListener('click', handleGlobalClick);
+    document.addEventListener('keydown', handleKeyDown);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('click', handleGlobalClick);
+      document.removeEventListener('keydown', handleKeyDown);
     };
   }, []);
 
@@ -44,7 +53,8 @@ const Select = ({
   const updateMenuPosition = () => {
     if (!buttonRef.current) return;
     const rect = buttonRef.current.getBoundingClientRect();
-    setMenuStyle({ top: rect.bottom + window.scrollY, left: rect.left + window.scrollX, width: rect.width });
+    // For fixed positioning, use viewport coordinates (no scroll offsets)
+    setMenuStyle({ top: rect.bottom, left: rect.left, width: rect.width });
   };
 
   const toggleDropdown = () => {
@@ -114,6 +124,7 @@ const Select = ({
             <div
               className="fixed z-[9999] mt-1 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5"
               style={{ top: `${menuStyle.top}px`, left: `${menuStyle.left}px`, width: `${menuStyle.width}px` }}
+              ref={menuRef}
             >
               <ul
                 tabIndex={-1}
