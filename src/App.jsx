@@ -23,6 +23,7 @@ import StudentEnrollment from './pages/admin/StudentEnrollment';
 import TeacherAssignment from './pages/admin/TeacherAssignment';
 import ProgramEnrollment from './pages/admin/ProgramEnrollment';
 import EnrollmentManagement from './pages/admin/EnrollmentManagement';
+import Students from './pages/admin/Students';
 import TeacherDashboard from './pages/teacher/Dashboard';
 import EnrolledStudents from './pages/teacher/EnrolledStudents';
 import StudentGrades from './pages/student/Grades';
@@ -114,6 +115,7 @@ function AppRoutes() {
       }>
         <Route index element={<AdminDashboard />} />
         <Route path="teachers" element={<Teachers />} />
+        <Route path="students" element={<Students />} />
         <Route path="enrollment" element={<StudentEnrollment />} />
         <Route path="program-enrollment" element={<ProgramEnrollment />} />
         <Route path="enrollment-management" element={<EnrollmentManagement />} />

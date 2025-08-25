@@ -7,6 +7,22 @@ const adminEnrollmentService = {
     return resp.data?.data ?? resp.data ?? [];
   },
 
+  // List students (paged)
+  listStudents: async ({ page = 1, limit = 50, search } = {}) => {
+    const params = { role: 'student', page, limit };
+    if (search) params.search = search;
+    const resp = await api.get('/api/admin/users', { params });
+    const data = resp.data?.data ?? resp.data ?? [];
+    const pagination = resp.data?.pagination;
+    return { data: Array.isArray(data) ? data : [], pagination };
+  },
+
+  // Delete a user by ID (student)
+  deleteUser: async (userId) => {
+    const resp = await api.delete(`/api/admin/users/${userId}`);
+    return resp.data;
+  },
+
   // Fetch enrollments for a specific student. Try multiple shapes/endpoints.
   getStudentEnrollments: async (studentId) => {
     // Preferred: RESTful nested route

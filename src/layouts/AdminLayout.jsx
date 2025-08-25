@@ -16,6 +16,7 @@ const AdminLayout = () => {
   const sidebarItems = [
     { name: 'Dashboard', href: '/admin', icon: BarChart3 },
     { name: 'Teachers', href: '/admin/teachers', icon: GraduationCap },
+    { name: 'Students', href: '/admin/students', icon: Users },
     { name: 'Student Enrollment', href: '/admin/enrollment', icon: UserPlus },
     { name: 'Course Enrollment', href: '/admin/program-enrollment', icon: BookOpen },
     { name: 'Enrollment Management', href: '/admin/enrollment-management', icon: Scissors },
