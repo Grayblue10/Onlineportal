@@ -8,7 +8,7 @@ import { useAuth } from '../../hooks/useAuth';
 export default function SystemSettings() {
   const { logout } = useAuth();
   const [settings, setSettings] = useState({
-    siteName: 'Online Grading System',
+    siteName: 'Online Portal',
     siteDescription: 'Comprehensive academic grading and management platform',
     allowRegistration: true,
     requireEmailVerification: true,
@@ -68,7 +68,7 @@ export default function SystemSettings() {
   const handleReset = () => {
     if (window.confirm('Are you sure you want to reset all settings to default values?')) {
       setSettings({
-        siteName: 'Online Grading System',
+        siteName: 'Online Portal',
         siteDescription: 'Comprehensive academic grading and management platform',
         allowRegistration: true,
         requireEmailVerification: true,
@@ -88,7 +88,7 @@ export default function SystemSettings() {
 
   const handleAboutSystem = () => {
     const aboutInfo = `
-Online Grading System v1.0.0
+Online Portal v1.0.0
 
 A comprehensive academic grading and management platform designed for universities.
 
