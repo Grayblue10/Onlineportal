@@ -61,10 +61,28 @@ const Students = () => {
     }
     try {
       setLoadingDetails(true);
-      const data = await adminEnrollmentService.getStudentEnrollments(sid);
-      setEnrollments(Array.isArray(data) ? data : (data.enrollments || []));
+      // Fetch enrollments
+      const [enrData, detailed] = await Promise.all([
+        adminEnrollmentService.getStudentEnrollments(sid),
+        // Try to fetch a detailed student record (with program) using email/name as search
+        (async () => {
+          try {
+            const search = s.email || s.username || s.name || displayName(s);
+            if (!search) return null;
+            const resp = await adminEnrollmentService.listStudents({ page: 1, limit: 5, search });
+            const arr = Array.isArray(resp?.data) ? resp.data : [];
+            // Prefer exact id match; fallback to email match
+            const match = arr.find(u => (u._id || u.id) === sid) || arr.find(u => u.email && (u.email === s.email));
+            return match || null;
+          } catch (_) { return null; }
+        })()
+      ]);
+      setEnrollments(Array.isArray(enrData) ? enrData : (enrData?.enrollments || []));
+      if (detailed && detailed.program) {
+        setSelected(prev => ({ ...prev, program: detailed.program }));
+      }
     } catch (err) {
-      console.error('[Admin Students] failed to load enrollments', err);
+      console.error('[Admin Students] failed to load enrollments/profile', err);
       setEnrollments([]);
     } finally {
       setLoadingDetails(false);
